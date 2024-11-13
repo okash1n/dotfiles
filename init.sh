@@ -64,8 +64,9 @@ install_packages
 # 実行完了メッセージ
 echo "Setup complete!"
 
-# zshをデフォルトシェルに設定するよう促すメッセージ
-echo "To set zsh as your default shell, run the following command:"
+# zshのパスを/etc/shellsに追加するためのコマンドと、デフォルトシェルに設定するコマンドの案内
+echo "To add zsh to /etc/shells and set it as your default shell, run the following commands:"
+echo 'echo "$(which zsh)" | sudo tee -a /etc/shells'
 echo 'chsh -s "$(which zsh)"'
 
 # zshを再実行することで、.zprofileなどを読み込ませる
