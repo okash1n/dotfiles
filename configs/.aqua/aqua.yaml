@@ -1,0 +1,13 @@
+# aqua.yaml
+
+version: "v2"
+
+registries:
+  - type: standard
+    ref: v3.4.0
+
+packages:
+  - name: sharkdp/bat@v0.24.0
+  - name: sharkdp/fd@v10.2.0
+  - name: bootandy/dust@v1.1.1
+  - name: dalance/procs@v0.14.8
