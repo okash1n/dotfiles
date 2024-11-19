@@ -19,6 +19,15 @@
                     },
                     "ignore": true
                 },
+                {   
+                    "identifiers": {
+                        "is_keyboard": true,
+                        "is_pointing_device": false,
+                        "product_id": 18805,
+                        "vendor_id": 12951
+                    },
+                    "ignore": false
+                },
                 {
                     "identifiers": {
                         "is_keyboard": true,
