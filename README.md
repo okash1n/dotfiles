@@ -29,3 +29,10 @@ cd dotfiles
 make init
 ```
 
+
+# 設定の更新
+Homebrew や Aqua でツールを手動でインストールした後は、次のコマンドで設定ファイルを最新化できます。
+
+```bash
+./update.sh
+```
