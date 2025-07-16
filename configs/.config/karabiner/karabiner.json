@@ -19,15 +19,6 @@
                     },
                     "ignore": true
                 },
-                {   
-                    "identifiers": {
-                        "is_keyboard": true,
-                        "is_pointing_device": false,
-                        "product_id": 18805,
-                        "vendor_id": 12951
-                    },
-                    "ignore": false
-                },
                 {
                     "identifiers": {
                         "is_keyboard": true,
@@ -40,6 +31,33 @@
                     "identifiers": {
                         "is_pointing_device": true,
                         "product_id": 49297,
+                        "vendor_id": 1133
+                    },
+                    "ignore": false,
+                    "mouse_flip_vertical_wheel": true
+                },
+                {
+                    "disable_built_in_keyboard_if_exists": true,
+                    "identifiers": {
+                        "is_keyboard": true,
+                        "is_pointing_device": true,
+                        "product_id": 21,
+                        "vendor_id": 1278
+                    },
+                    "mouse_swap_wheels": true
+                },
+                {
+                    "identifiers": {
+                        "is_pointing_device": true,
+                        "product_id": 21,
+                        "vendor_id": 1278
+                    },
+                    "ignore": false
+                },
+                {
+                    "identifiers": {
+                        "is_pointing_device": true,
+                        "product_id": 50489,
                         "vendor_id": 1133
                     },
                     "ignore": false,
