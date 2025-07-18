@@ -1,0 +1,60 @@
+# Claude lock files
+configs/.claude/**/*.lock
+configs/.claude/ide/*.lock
+
+# Claude projects - 除外するもの
+.claude/projects/*/history/
+.claude/projects/*/conversations/
+.claude/projects/*/cache/
+.claude/projects/*/tmp/
+.claude/projects/*/logs/
+.claude/projects/*/.env
+.claude/projects/*/secrets/
+.claude/projects/*/generated/
+.claude/projects/*/artifacts/
+configs/.claude/projects/*/history/
+configs/.claude/projects/*/conversations/
+configs/.claude/projects/*/cache/
+configs/.claude/projects/*/tmp/
+configs/.claude/projects/*/logs/
+configs/.claude/projects/*/.env
+configs/.claude/projects/*/secrets/
+configs/.claude/projects/*/generated/
+configs/.claude/projects/*/artifacts/
+
+# ローカル環境依存
+.claude/projects/*/local/
+.claude/projects/*/.workspace
+configs/.claude/projects/*/local/
+configs/.claude/projects/*/.workspace
+
+# でも、プロジェクト設定は保持
+!.claude/projects/*/config.json
+!.claude/projects/*/settings.json
+!.claude/projects/*/prompts/
+!.claude/projects/*/templates/
+!.claude/projects/*/README.md
+!configs/.claude/projects/*/config.json
+!configs/.claude/projects/*/settings.json
+!configs/.claude/projects/*/prompts/
+!configs/.claude/projects/*/templates/
+!configs/.claude/projects/*/README.md
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Editor directories and files
+.idea
+.vscode
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.temp

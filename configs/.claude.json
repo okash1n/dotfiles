@@ -40,6 +40,10 @@
       "allowedTools": [],
       "history": [
         {
+          "display": "configs/.claude 内の lockファイルはgitで無視するようにして",
+          "pastedContents": {}
+        },
+        {
           "display": "午前二時じゃなくて、3時間ごとに実施するように変更してください",
           "pastedContents": {}
         },

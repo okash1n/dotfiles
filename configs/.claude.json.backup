@@ -40,6 +40,10 @@
       "allowedTools": [],
       "history": [
         {
+          "display": "午前二時じゃなくて、3時間ごとに実施するように変更してください",
+          "pastedContents": {}
+        },
+        {
           "display": "cronなどから実行した場合のみそれらが実行されるようにしてほしいです。（手動でupdate.shを実行した際は以前のまま実行されて欲しいです）",
           "pastedContents": {}
         },
