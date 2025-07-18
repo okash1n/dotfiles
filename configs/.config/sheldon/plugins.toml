@@ -34,4 +34,4 @@ github = "zsh-users/zsh-completions"
 
 [plugins.local]
 local = "~/.config/zsh"
-use = ["*.zsh"]
+use = ["*.zsh", "*.zsh-theme"]

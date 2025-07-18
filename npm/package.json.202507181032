@@ -1,0 +1,8 @@
+{
+  "name": "global-packages",
+  "version": "1.0.0",
+  "description": "NPM global packages backup",
+  "dependencies": {
+    
+  }
+}

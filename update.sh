@@ -4,6 +4,25 @@ set -e
 # スクリプト自身のディレクトリを確実に格納
 SCRIPT_DIR=$(cd $(dirname $0); pwd)
 
+# cronや非インタラクティブシェルから実行された場合のPATH設定
+# TTYが割り当てられていない、またはPATHが最小限の場合
+if [ ! -t 0 ] || [ -z "$PS1" ] || [[ "$PATH" != *"/opt/homebrew"* && "$PATH" != *"/usr/local/bin"* ]]; then
+    # Homebrewのパスを追加 (Intel/Apple Silicon両対応)
+    if [ -f "/opt/homebrew/bin/brew" ]; then
+        # Apple Silicon Mac
+        eval "$(/opt/homebrew/bin/brew shellenv)"
+    elif [ -f "/usr/local/bin/brew" ]; then
+        # Intel Mac
+        eval "$(/usr/local/bin/brew shellenv)"
+    elif [ -f "/home/linuxbrew/.linuxbrew/bin/brew" ]; then
+        # Linux
+        eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+    fi
+    
+    # 基本的なPATHを確保
+    export PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:$PATH"
+fi
+
 # 色付き出力用の関数
 print_section() {
     echo -e "\n\033[1;34m=== $1 ===\033[0m"

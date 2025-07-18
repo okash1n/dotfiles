@@ -223,3 +223,37 @@ ghce() {
 	GH_DEBUG="$GH_DEBUG" GH_HOST="$GH_HOST" gh copilot explain "$@"
 }
 
+# dotfilesの更新処理を実行
+update-dotfiles() {
+  # dotfilesディレクトリのパスを取得
+  local DOTFILES_DIR="$HOME/dotfiles"
+  
+  # dotfilesディレクトリが存在するか確認
+  if [ ! -d "$DOTFILES_DIR" ]; then
+    echo "Error: dotfiles directory not found at $DOTFILES_DIR"
+    return 1
+  fi
+  
+  # update.shスクリプトが存在するか確認
+  if [ ! -f "$DOTFILES_DIR/update.sh" ]; then
+    echo "Error: update.sh not found at $DOTFILES_DIR/update.sh"
+    return 1
+  fi
+  
+  # update.shを実行
+  echo "Running dotfiles update script..."
+  if bash "$DOTFILES_DIR/update.sh"; then
+    echo ""
+    echo "Reloading ZSH configuration..."
+    
+    # ZSHの設定ファイルを再読み込み
+    source ~/.zshrc
+    
+    echo "✓ ZSH configuration reloaded successfully!"
+    echo "✓ Dotfiles update completed!"
+  else
+    echo "✗ Update script failed. ZSH configuration not reloaded."
+    return 1
+  fi
+}
+

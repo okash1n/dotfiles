@@ -55,11 +55,37 @@ install_packages() {
   "$AQUA_PATH" i -a
 }
 
+# update.shの定期実行を設定 (cronジョブ)
+setup_cron_job() {
+  echo "Setting up cron job for update.sh..."
+  
+  # update.shのフルパス
+  UPDATE_SCRIPT="$SCRIPT_DIR/update.sh"
+  
+  # cronジョブの内容 (3時間ごとに実行)
+  # HOME環境変数を明示的に設定
+  CRON_JOB="0 */3 * * * HOME=$HOME /bin/bash $UPDATE_SCRIPT >> /tmp/dotfiles-update.log 2>&1"
+  
+  # 既存のcrontabを取得
+  CURRENT_CRONTAB=$(crontab -l 2>/dev/null || echo "")
+  
+  # 既にupdate.shのcronジョブが存在するかチェック
+  if echo "$CURRENT_CRONTAB" | grep -q "$UPDATE_SCRIPT"; then
+    echo "Cron job for update.sh already exists. Skipping..."
+  else
+    # 新しいcronジョブを追加
+    (echo "$CURRENT_CRONTAB"; echo "$CRON_JOB") | crontab -
+    echo "Cron job added: Execution of update.sh every 3 hours"
+    echo "Log file: /tmp/dotfiles-update.log"
+  fi
+}
+
 # 実行
 install_rosetta
 install_homebrew
 link_dotfiles
 install_packages
+setup_cron_job
 
 # 実行完了メッセージ
 echo "Setup complete!"
