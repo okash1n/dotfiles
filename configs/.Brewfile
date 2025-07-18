@@ -38,3 +38,5 @@ cask "ghostty"
 cask "slack-cli"
 # Open-source code editor
 cask "visual-studio-code"
+vscode "anthropic.claude-code"
+vscode "dracula-theme-pro.theme-dracula-pro"
