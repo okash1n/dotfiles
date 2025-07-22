@@ -1,0 +1,32 @@
+[
+  {
+    "content": "コードベースの詳細分析と改善点の洗い出し",
+    "status": "completed",
+    "priority": "high",
+    "id": "1"
+  },
+  {
+    "content": "エラーハンドリングとユーザーフィードバックの改善提案",
+    "status": "completed",
+    "priority": "high",
+    "id": "2"
+  },
+  {
+    "content": "コード構造とアーキテクチャの改善提案",
+    "status": "completed",
+    "priority": "medium",
+    "id": "3"
+  },
+  {
+    "content": "パフォーマンスとUXの改善提案",
+    "status": "completed",
+    "priority": "medium",
+    "id": "4"
+  },
+  {
+    "content": "セキュリティとデータ管理の改善提案",
+    "status": "completed",
+    "priority": "high",
+    "id": "5"
+  }
+]

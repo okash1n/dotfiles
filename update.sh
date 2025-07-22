@@ -166,6 +166,7 @@ EOF
 
 # メイン処理
 main() {
+    echo -e "\033[0;33m$(date '+%Y-%m-%d %H:%M:%S')\033[0m"
     echo "Starting system update and dotfiles backup process..."
     
     # エラーが発生しても続行するようにset -eを一時的に無効化
