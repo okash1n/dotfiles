@@ -1,0 +1,12 @@
+[data]
+    name = "okash1n"
+    email = "okash1n@cloudnative.co.jp"
+
+[edit]
+    command = "vim"
+
+[git]
+    autoCommit = false
+    autoPush = false
+
+sourceDir = "/Users/okash1n/dotfiles"

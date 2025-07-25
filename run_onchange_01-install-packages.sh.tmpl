@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+set -e
+
+# このスクリプトはBrewfileの内容が変更されたときに実行されます
+# hash: {{ include "dot_Brewfile" | sha256sum }}
+
+echo "Installing/updating Homebrew packages..."
+
+# Homebrewのパスを設定
+if [ -f "/opt/homebrew/bin/brew" ]; then
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+elif [ -f "/usr/local/bin/brew" ]; then
+    eval "$(/usr/local/bin/brew shellenv)"
+elif [ -f "/home/linuxbrew/.linuxbrew/bin/brew" ]; then
+    eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+fi
+
+# Brewfileからパッケージをインストール
+if [ -f "$HOME/.Brewfile" ]; then
+    echo "Installing packages from Brewfile..."
+    brew bundle --global
+else
+    echo "Warning: Brewfile not found at ~/.Brewfile"
+fi
+
+# Aquaがインストールされている場合はaquaのパッケージもインストール
+if command -v aqua &> /dev/null; then
+    echo "Installing aqua packages..."
+    aqua i -a
+fi

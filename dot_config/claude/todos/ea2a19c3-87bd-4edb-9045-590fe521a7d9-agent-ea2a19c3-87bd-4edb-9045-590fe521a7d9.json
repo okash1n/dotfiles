@@ -1,0 +1,20 @@
+[
+  {
+    "content": "git statusで現在の状態を確認",
+    "status": "pending",
+    "priority": "high",
+    "id": "1"
+  },
+  {
+    "content": "ステージされている変更をコミット",
+    "status": "pending",
+    "priority": "high",
+    "id": "2"
+  },
+  {
+    "content": "リモートにプッシュ",
+    "status": "pending",
+    "priority": "medium",
+    "id": "3"
+  }
+]

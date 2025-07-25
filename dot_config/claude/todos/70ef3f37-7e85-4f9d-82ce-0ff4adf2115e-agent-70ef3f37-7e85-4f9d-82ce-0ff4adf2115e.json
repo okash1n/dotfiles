@@ -1,0 +1,38 @@
+[
+  {
+    "content": "chezmoiへの移行作業の現状を確認",
+    "status": "completed",
+    "priority": "high",
+    "id": "1"
+  },
+  {
+    "content": "削除されたファイルの確認と処理",
+    "status": "completed",
+    "priority": "high",
+    "id": "2"
+  },
+  {
+    "content": "chezmoi設定ファイルの作成",
+    "status": "completed",
+    "priority": "medium",
+    "id": "3"
+  },
+  {
+    "content": "dotfilesのchezmoi管理への移行",
+    "status": "completed",
+    "priority": "medium",
+    "id": "4"
+  },
+  {
+    "content": "chezmoiの初期化",
+    "status": "completed",
+    "priority": "high",
+    "id": "5"
+  },
+  {
+    "content": "chezmoi applyでファイルを適用",
+    "status": "in_progress",
+    "priority": "high",
+    "id": "6"
+  }
+]

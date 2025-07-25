@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+set -e
+
+# このスクリプトはBrewfileやglobal-packages.jsonが変更されたときに
+# パッケージを更新するためのスクリプトです
+# hash: {{ include "dot_Brewfile" | sha256sum }}
+# hash: {{ include "dot_config/npm/global-packages.json" | sha256sum }}
+
+echo "=== Updating system packages ==="
+
+# Homebrewのパスを設定
+if [ -f "/opt/homebrew/bin/brew" ]; then
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+elif [ -f "/usr/local/bin/brew" ]; then
+    eval "$(/usr/local/bin/brew shellenv)"
+elif [ -f "/home/linuxbrew/.linuxbrew/bin/brew" ]; then
+    eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+fi
+
+# Homebrewの更新
+if command -v brew &> /dev/null; then
+    echo "Updating Homebrew..."
+    brew update
+    
+    echo "Upgrading Homebrew packages..."
+    brew upgrade
+    
+    echo "Installing new packages from Brewfile..."
+    if [ -f "$HOME/.Brewfile" ]; then
+        brew bundle --global
+    fi
+    
+    echo "Cleaning up old versions..."
+    brew cleanup
+fi
+
+# NPMグローバルパッケージの更新
+if command -v npm &> /dev/null; then
+    echo ""
+    echo "Updating NPM global packages..."
+    npm update -g
+fi
+
+# Aquaパッケージの更新
+if command -v aqua &> /dev/null; then
+    echo ""
+    echo "Updating Aqua packages..."
+    aqua update
+fi
+
+echo ""
+echo "✓ All packages updated!"

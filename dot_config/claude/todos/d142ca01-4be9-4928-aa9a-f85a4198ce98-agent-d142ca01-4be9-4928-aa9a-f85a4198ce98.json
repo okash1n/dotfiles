@@ -1,0 +1,20 @@
+[
+  {
+    "content": "update.shの内容を確認",
+    "status": "completed",
+    "priority": "high",
+    "id": "1"
+  },
+  {
+    "content": "現在のプロジェクト構造との整合性を確認",
+    "status": "completed",
+    "priority": "high",
+    "id": "2"
+  },
+  {
+    "content": "必要な修正箇所を特定",
+    "status": "in_progress",
+    "priority": "medium",
+    "id": "3"
+  }
+]

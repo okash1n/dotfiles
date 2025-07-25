@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+set -e
+
+# このスクリプトはglobal-packages.jsonの内容が変更されたときに実行されます
+# hash: {{ include "dot_config/npm/global-packages.json" | sha256sum }}
+
+echo "Installing/updating NPM global packages..."
+
+# npmが利用可能かチェック
+if ! command -v npm &> /dev/null; then
+    echo "npm is not installed. Skipping..."
+    exit 0
+fi
+
+# global-packages.jsonが存在する場合
+if [ -f "$HOME/.config/npm/global-packages.json" ]; then
+    echo "Installing packages from global-packages.json..."
+    
+    # package.jsonから依存関係を読み取ってインストール
+    PACKAGES=$(jq -r '.dependencies | to_entries | .[] | "\(.key)@\(.value)"' "$HOME/.config/npm/global-packages.json" | tr '\n' ' ')
+    
+    if [ -n "$PACKAGES" ]; then
+        echo "Installing: $PACKAGES"
+        npm install -g $PACKAGES
+    else
+        echo "No packages found in global-packages.json"
+    fi
+else
+    echo "Warning: global-packages.json not found at ~/.config/npm/global-packages.json"
+fi

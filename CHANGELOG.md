@@ -5,6 +5,42 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.5] - 2025-07-25
+
+### Added
+- [chezmoi](https://www.chezmoi.io/)によるdotfiles管理システムの導入
+  - `.chezmoi.toml.tmpl`: chezmoi設定テンプレート
+  - `.chezmoiignore`: chezmoi管理から除外するファイルの定義
+  - `run_once_`スクリプト: 初回セットアップ時の自動実行
+  - `run_onchange_`スクリプト: ファイル変更時の自動実行
+- 自動更新機能
+  - macOS launchdによる毎日12:00の自動更新
+  - Brewfile/package.json変更時の自動パッケージインストール
+- chezmoiをBrewfileに追加
+
+### Changed
+- dotfilesのディレクトリ構造をchezmoi規約に準拠
+  - `configs/` → `dot_config/`
+  - 隠しファイルの命名規則（`.zshrc` → `dot_zshrc`）
+- Brewfileの配置を標準位置に変更
+  - `~/.config/homebrew/Brewfile` → `~/.Brewfile`
+  - `HOMEBREW_BUNDLE_FILE`環境変数を削除
+  - `brew bundle --global`コマンドのサポート
+- セットアップフローの簡素化
+  - `init.sh`: Homebrewとchezmoiのセットアップに特化
+  - `update.sh`: chezmoiの機能に置き換え（非推奨）
+- XDGディレクトリパスの末尾スラッシュを削除（ダブルスラッシュ問題の修正）
+
+### Fixed
+- post-apply hookの削除（新規zshセッション起動の問題を修正）
+- run_onceスクリプトの番号付けを連番に修正
+
+### Documentation
+- READMEをchezmoi中心の内容に全面改訂
+  - セットアップ手順の更新
+  - chezmoiコマンドの使い方
+  - トラブルシューティングセクション
+
 ## [0.8.0] - 2025-07-25
 
 ### Added

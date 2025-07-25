@@ -1,0 +1,26 @@
+[
+  {
+    "content": "CLAUDE_CONFIG_DIRの現在の設定を確認",
+    "status": "completed",
+    "priority": "high",
+    "id": "1"
+  },
+  {
+    "content": ".claudeディレクトリをXDG_CONFIG_HOME下に移動",
+    "status": "in_progress",
+    "priority": "high",
+    "id": "2"
+  },
+  {
+    "content": "CLAUDE_CONFIG_DIR環境変数を.zshenvに追加",
+    "status": "pending",
+    "priority": "medium",
+    "id": "3"
+  },
+  {
+    "content": "シンボリックリンクを更新",
+    "status": "pending",
+    "priority": "low",
+    "id": "4"
+  }
+]

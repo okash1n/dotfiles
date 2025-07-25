@@ -1,0 +1,17 @@
+# chezmoi configuration template
+
+[data]
+    name = "{{ .name }}"
+    email = "{{ .email }}"
+
+[git]
+    autoCommit = false
+    autoPush = false
+
+[edit]
+    command = "vim"
+
+# Hooks can be defined here if needed
+# [hooks]
+#     post.apply.command = "echo"
+#     post.apply.args = ["Please restart your terminal for all changes to take effect"]

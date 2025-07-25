@@ -1,0 +1,38 @@
+[
+  {
+    "content": "chezmoiのインストールと基本設定",
+    "status": "completed",
+    "priority": "high",
+    "id": "1"
+  },
+  {
+    "content": "現在のdotfilesをchezmoi形式に変換",
+    "status": "in_progress",
+    "priority": "high",
+    "id": "2"
+  },
+  {
+    "content": "init.shの機能をchezmoiスクリプトに移植",
+    "status": "pending",
+    "priority": "medium",
+    "id": "3"
+  },
+  {
+    "content": "update.shの機能をchezmoiスクリプトに移植",
+    "status": "pending",
+    "priority": "medium",
+    "id": "4"
+  },
+  {
+    "content": "Makefileの作成",
+    "status": "pending",
+    "priority": "medium",
+    "id": "5"
+  },
+  {
+    "content": "READMEの更新",
+    "status": "pending",
+    "priority": "low",
+    "id": "6"
+  }
+]
