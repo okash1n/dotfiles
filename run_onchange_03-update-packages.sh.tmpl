@@ -3,7 +3,7 @@ set -e
 
 # このスクリプトはBrewfileやglobal-packages.jsonが変更されたときに
 # パッケージを更新するためのスクリプトです
-# hash: {{ include "dot_config/homebrew/Brewfile" | sha256sum }}
+# hash: {{ include "dot_Brewfile" | sha256sum }}
 # hash: {{ include "dot_config/npm/global-packages.json" | sha256sum }}
 
 echo "=== Updating system packages ==="
@@ -26,8 +26,8 @@ if command -v brew &> /dev/null; then
     brew upgrade
     
     echo "Installing new packages from Brewfile..."
-    if [ -f "$HOME/.config/homebrew/Brewfile" ]; then
-        HOMEBREW_BUNDLE_FILE="$HOME/.config/homebrew/Brewfile" brew bundle
+    if [ -f "$HOME/.Brewfile" ]; then
+        brew bundle --global
     fi
     
     echo "Cleaning up old versions..."

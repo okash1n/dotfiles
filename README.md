@@ -41,8 +41,8 @@ make init  # または ./init.sh
 
 ```
 dotfiles/
+├── dot_Brewfile          # ~/.Brewfile (Homebrewパッケージ定義)
 ├── dot_config/           # ~/.config/ に配置される設定ファイル
-│   ├── homebrew/        # Brewfile
 │   ├── npm/             # NPMグローバルパッケージ
 │   ├── zsh/             # Zsh設定
 │   └── ...
@@ -78,10 +78,10 @@ chezmoi cd
 **Homebrewパッケージを追加した場合**:
 ```bash
 # Brewfileを更新
-brew bundle dump --file=~/.config/homebrew/Brewfile --force
+brew bundle dump --global --force --describe
 
 # chezmoiに反映
-chezmoi add ~/.config/homebrew/Brewfile
+chezmoi add ~/.Brewfile
 ```
 
 **NPMグローバルパッケージ**:

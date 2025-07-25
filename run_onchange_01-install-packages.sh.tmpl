@@ -2,7 +2,7 @@
 set -e
 
 # このスクリプトはBrewfileの内容が変更されたときに実行されます
-# hash: {{ include "dot_config/homebrew/Brewfile" | sha256sum }}
+# hash: {{ include "dot_Brewfile" | sha256sum }}
 
 echo "Installing/updating Homebrew packages..."
 
@@ -16,11 +16,11 @@ elif [ -f "/home/linuxbrew/.linuxbrew/bin/brew" ]; then
 fi
 
 # Brewfileからパッケージをインストール
-if [ -f "$HOME/.config/homebrew/Brewfile" ]; then
+if [ -f "$HOME/.Brewfile" ]; then
     echo "Installing packages from Brewfile..."
-    HOMEBREW_BUNDLE_FILE="$HOME/.config/homebrew/Brewfile" brew bundle
+    brew bundle --global
 else
-    echo "Warning: Brewfile not found at ~/.config/homebrew/Brewfile"
+    echo "Warning: Brewfile not found at ~/.Brewfile"
 fi
 
 # Aquaがインストールされている場合はaquaのパッケージもインストール

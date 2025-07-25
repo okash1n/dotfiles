@@ -63,9 +63,8 @@ fi
 # Brewfileからパッケージをインストール
 echo ""
 echo "=== Installing packages from Brewfile ==="
-# 一時的にBrewfileの場所を設定
-export HOMEBREW_BUNDLE_FILE="$SCRIPT_DIR/dot_config/homebrew/Brewfile"
-brew bundle
+# グローバルBrewfileからインストール
+brew bundle --global
 echo "✓ All packages installed"
 
 # chezmoiが正しくインストールされたか確認
