@@ -3,6 +3,8 @@ tap "hashicorp/tap"
 tap "homebrew/bundle"
 # Declarative CLI Version manager
 brew "aqua"
+# Manage your dotfiles across multiple diverse machines, securely
+brew "chezmoi"
 # Text processing scripting language
 brew "awk"
 # Get a file from an HTTP, HTTPS or FTP server
