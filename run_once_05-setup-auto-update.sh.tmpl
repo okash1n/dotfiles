@@ -1,0 +1,65 @@
+#!/usr/bin/env bash
+set -e
+
+# このスクリプトは定期的な自動更新を設定します
+# macOSのlaunchdを使用してchezmoiの更新を定期的に実行
+
+echo "=== Setting up automatic updates ==="
+
+# launchdの設定ファイルを作成
+PLIST_PATH="$HOME/Library/LaunchAgents/com.chezmoi.update.plist"
+
+# 既存の設定があれば削除
+if [ -f "$PLIST_PATH" ]; then
+    launchctl unload "$PLIST_PATH" 2>/dev/null || true
+fi
+
+# 新しい設定を作成
+cat > "$PLIST_PATH" <<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.chezmoi.update</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>{{ lookPath "chezmoi" }}</string>
+        <string>update</string>
+        <string>--apply</string>
+    </array>
+    <key>StartCalendarInterval</key>
+    <array>
+        <!-- 毎日12:00に実行 -->
+        <dict>
+            <key>Hour</key>
+            <integer>12</integer>
+            <key>Minute</key>
+            <integer>0</integer>
+        </dict>
+    </array>
+    <key>StandardOutPath</key>
+    <string>/tmp/chezmoi-update.log</string>
+    <key>StandardErrorPath</key>
+    <string>/tmp/chezmoi-update.log</string>
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+        <key>HOME</key>
+        <string>{{ .chezmoi.homeDir }}</string>
+    </dict>
+</dict>
+</plist>
+EOF
+
+# 設定を読み込む
+launchctl load "$PLIST_PATH"
+
+echo "✓ Automatic daily updates configured"
+echo "  Updates will run daily at 12:00 PM"
+echo "  Logs: /tmp/chezmoi-update.log"
+echo ""
+echo "To disable automatic updates, run:"
+echo "  launchctl unload ~/Library/LaunchAgents/com.chezmoi.update.plist"
+echo "  rm ~/Library/LaunchAgents/com.chezmoi.update.plist"
