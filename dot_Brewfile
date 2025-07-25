@@ -3,10 +3,10 @@ tap "hashicorp/tap"
 tap "homebrew/bundle"
 # Declarative CLI Version manager
 brew "aqua"
-# Manage your dotfiles across multiple diverse machines, securely
-brew "chezmoi"
 # Text processing scripting language
 brew "awk"
+# Manage your dotfiles across multiple diverse machines, securely
+brew "chezmoi"
 # Get a file from an HTTP, HTTPS or FTP server
 brew "curl"
 # Command-line fuzzy finder written in Go
@@ -23,10 +23,14 @@ brew "node"
 brew "powerlevel10k"
 # Fast, configurable, shell plugin manager
 brew "sheldon"
+# Prints a steam locomotive if you type sl instead of ls
+brew "sl"
 # Display directories as trees (with optional color/HTML output)
 brew "tree"
 # Internet file retriever
 brew "wget"
+# Check your $HOME for unwanted files and directories
+brew "xdg-ninja"
 # UNIX shell (command interpreter)
 brew "zsh"
 # Terraform

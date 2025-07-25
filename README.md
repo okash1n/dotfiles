@@ -1,5 +1,8 @@
 # dotfiles
 
+[![Version](https://img.shields.io/badge/version-0.8.5-blue.svg)](https://github.com/okash1n/dotfiles/releases)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+
 okash1nのdotfiles（令和最新版）
 
 このリポジトリは[chezmoi](https://www.chezmoi.io/)を使用してdotfilesを管理しています。
