@@ -1,44 +1,36 @@
-# Claude lock files
-configs/.claude/**/*.lock
-configs/.claude/ide/*.lock
+# Claude
+configs/claude/ide/*.lock
+configs/claude/shell-snapshots/*.sh
+configs/claude/statsig/
+configs/claude/todos/
+configs/claude/projects/*/*.jsonl
+configs/claude/.claude.json
+configs/claude/.claude.json.backup
 
-# Claude projects - 除外するもの
-.claude/projects/*/history/
-.claude/projects/*/conversations/
-.claude/projects/*/cache/
-.claude/projects/*/tmp/
-.claude/projects/*/logs/
-.claude/projects/*/.env
-.claude/projects/*/secrets/
-.claude/projects/*/generated/
-.claude/projects/*/artifacts/
-configs/.claude/projects/*/history/
-configs/.claude/projects/*/conversations/
-configs/.claude/projects/*/cache/
-configs/.claude/projects/*/tmp/
-configs/.claude/projects/*/logs/
-configs/.claude/projects/*/.env
-configs/.claude/projects/*/secrets/
-configs/.claude/projects/*/generated/
-configs/.claude/projects/*/artifacts/
+# でも、プロジェクト設定とログは保持
+!configs/claude/CLAUDE.md
 
-# ローカル環境依存
-.claude/projects/*/local/
-.claude/projects/*/.workspace
-configs/.claude/projects/*/local/
-configs/.claude/projects/*/.workspace
+# Raycast extensions
+configs/raycast/extensions/*/node_modules/
+configs/raycast/extensions/node_modules
 
-# でも、プロジェクト設定は保持
-!.claude/projects/*/config.json
-!.claude/projects/*/settings.json
-!.claude/projects/*/prompts/
-!.claude/projects/*/templates/
-!.claude/projects/*/README.md
-!configs/.claude/projects/*/config.json
-!configs/.claude/projects/*/settings.json
-!configs/.claude/projects/*/prompts/
-!configs/.claude/projects/*/templates/
-!configs/.claude/projects/*/README.md
+# npm backups
+npm/*.202*
+
+# Karabiner automatic backups
+configs/karabiner/automatic_backups/
+
+# Homebrew
+configs/homebrew/Brewfile.lock.json
+
+# aqua
+configs/aqua/.bin/
+
+# glow
+configs/glow/stash/
+
+# ZSH compiled files
+configs/zsh/*.zwc
 
 # macOS
 .DS_Store
