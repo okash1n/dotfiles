@@ -5,6 +5,32 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.0] - 2025-07-25
+
+### Added
+- NPMをXDG Base Directory準拠で管理する設定を追加
+  - `configs/npm/npmrc`: NPM設定ファイル（キャッシュ、グローバルパッケージ、ログパスを設定）
+  - 環境変数`NPM_CONFIG_USERCONFIG`を`.zshenv`に追加
+  - NPMグローバルbinディレクトリをPATHに追加
+
+### Changed
+- dotfilesディレクトリ構造を再編成
+  - 設定ファイルを隠しディレクトリから整理された構造に移動
+  - `configs/.config/` → `configs/`への移動（gh, ghostty, git, karabiner, raycast等）
+  - `configs/.aqua/` → `configs/aqua/`
+  - `configs/.Brewfile` → `configs/homebrew/Brewfile`
+- NPMグローバルパッケージの管理場所を変更
+  - `npm/package.json` → `configs/npm/global-packages.json`
+  - `update.sh`のパスを新しい構造に合わせて更新
+- .gitignoreを更新
+  - `.zsh_history`を追加（すでに追跡されていたファイルも削除）
+  - npmバックアップファイルのパスを更新
+
+### Removed
+- 一時的なClaudeファイルとキャッシュを削除
+- 空になった`npm/`ディレクトリを削除
+- `~/.npm`ディレクトリ（XDG準拠のパスに移行）
+
 ## [0.6.1] - 2025-07-25
 
 ### Changed
