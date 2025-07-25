@@ -32,6 +32,9 @@ configs/glow/stash/
 # ZSH compiled files
 configs/zsh/*.zwc
 
+# ZSH history
+configs/zsh/.zsh_history
+
 # macOS
 .DS_Store
 .AppleDouble
