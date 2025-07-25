@@ -18,3 +18,7 @@ export PATH="${AQUA_ROOT_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/aquaproj-aqua
 # Homebrew Bundle
 export HOMEBREW_BUNDLE_FILE="${XDG_CONFIG_HOME:-$HOME/.config}/homebrew/Brewfile"
 
+# NPM configuration for XDG compliance
+export NPM_CONFIG_USERCONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/npm/npmrc"
+export PATH="${XDG_DATA_HOME:-$HOME/.local/share}/npm/bin:$PATH"
+

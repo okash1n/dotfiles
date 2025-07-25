@@ -40,13 +40,35 @@ link_dotfiles() {
 
   CONFIG_DIR="$SCRIPT_DIR/configs"
   
+  # XDG Base Directoryの設定
+  export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
+  export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
+  export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
+  export XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
+  
+  # 必要なディレクトリを作成
+  mkdir -p "$XDG_CONFIG_HOME" "$XDG_CACHE_HOME" "$XDG_DATA_HOME" "$XDG_STATE_HOME"
+  
   # .configディレクトリ以下のファイルは特別に処理
   if [ -d "$CONFIG_DIR/.config" ]; then
-    mkdir -p "$HOME/.config"
     for config_item in "$CONFIG_DIR/.config"/*; do
       [ ! -e "$config_item" ] && continue
       ln -snf "$config_item" "$HOME/.config/$(basename "$config_item")"
     done
+  fi
+  
+  # NPM設定のシンボリックリンク
+  if [ -d "$CONFIG_DIR/npm" ]; then
+    mkdir -p "$XDG_CONFIG_HOME/npm"
+    ln -snf "$CONFIG_DIR/npm/npmrc" "$XDG_CONFIG_HOME/npm/npmrc"
+    
+    # NPMのディレクトリを作成
+    mkdir -p "$XDG_CACHE_HOME/npm"
+    mkdir -p "$XDG_DATA_HOME/npm"
+    mkdir -p "$XDG_STATE_HOME/npm/logs"
+    
+    # NPM_CONFIG_USERCONFIGを設定
+    export NPM_CONFIG_USERCONFIG="$XDG_CONFIG_HOME/npm/npmrc"
   fi
   
   # その他のdotfilesは通常通り処理（ただし.configは除外）

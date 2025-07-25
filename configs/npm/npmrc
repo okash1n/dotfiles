@@ -1,0 +1,17 @@
+# NPM configuration for XDG Base Directory compliance
+
+# Set cache directory
+cache=/Users/okash1n/.cache/npm
+
+# Set global packages directory
+prefix=/Users/okash1n/.local/share/npm
+
+# Use XDG_CONFIG_HOME for init-module
+init-module=/Users/okash1n/.config/npm/npm-init.js
+
+# Store logs
+logs-dir=/Users/okash1n/.local/state/npm/logs
+
+# Other useful settings
+update-notifier=false
+fund=false

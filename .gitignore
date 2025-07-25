@@ -15,7 +15,7 @@ configs/raycast/extensions/*/node_modules/
 configs/raycast/extensions/node_modules
 
 # npm backups
-npm/*.202*
+configs/npm/*.202*
 
 # Karabiner automatic backups
 configs/karabiner/automatic_backups/

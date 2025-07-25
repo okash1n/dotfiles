@@ -105,8 +105,8 @@ update_npm_global() {
     print_section "Backing up NPM Global Packages"
     
     # 設定
-    PACKAGE_JSON_PATH="$HOME/dotfiles/npm/package.json"
-    BACKUP_DIR="$HOME/dotfiles/npm"
+    PACKAGE_JSON_PATH="$HOME/dotfiles/configs/npm/global-packages.json"
+    BACKUP_DIR="$HOME/dotfiles/configs/npm"
     MAX_BACKUPS=5
     
     # 現在の日時を取得 (YYYYMMDDhhmm形式)
