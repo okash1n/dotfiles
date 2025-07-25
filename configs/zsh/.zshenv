@@ -22,3 +22,14 @@ export HOMEBREW_BUNDLE_FILE="${XDG_CONFIG_HOME:-$HOME/.config}/homebrew/Brewfile
 export NPM_CONFIG_USERCONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/npm/npmrc"
 export PATH="${XDG_DATA_HOME:-$HOME/.local/share}/npm/bin:$PATH"
 
+# Less
+export LESSHISTFILE="${XDG_STATE_HOME:-$HOME/.local/state}/less/history"
+
+# XDG Runtime Directory (macOS specific)
+# macOSでは/var/runは使用できないため、一時ディレクトリを使用
+if [[ -z "$XDG_RUNTIME_DIR" ]]; then
+    export XDG_RUNTIME_DIR="$TMPDIR/runtime-$UID"
+    mkdir -p "$XDG_RUNTIME_DIR"
+    chmod 700 "$XDG_RUNTIME_DIR"
+fi
+

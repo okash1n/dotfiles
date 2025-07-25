@@ -5,6 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.0] - 2025-07-25
+
+### Added
+- XDG Base Directory仕様への全面的な対応
+  - `LESSHISTFILE`を`$XDG_STATE_HOME/less/history`に設定
+  - Vim設定ファイル（`configs/vim/vimrc`）を追加、`.viminfo`をXDG準拠に
+  - ZSHのキャッシュと履歴をXDG準拠のパスに設定
+  - `XDG_RUNTIME_DIR`の設定を追加（macOS用に一時ディレクトリを使用）
+- 環境変数設定の拡充
+  - `.zshenv`にLESS、NPM、XDG_RUNTIME_DIRの設定を追加
+  - `.zshrc`にZSHのcompletion cache、history、compdumpの設定を追加
+
+### Changed
+- `init.sh`のNPM設定処理を改善
+  - XDGディレクトリの作成処理を追加
+  - NPM設定のシンボリックリンク作成処理を追加
+
+### Removed
+- ホームディレクトリの不要なファイル・ディレクトリを削除
+  - `.configback`（空のバックアップディレクトリ）
+  - `.zcompcache`（古いZSHキャッシュ）
+  - `.zsh_sessions`（ZSHセッション履歴）
+  - `.terminfo`（XDGに移行済み）
+  - `.lesshst`、`.viminfo`、`.zcompdump*`、`.zsh_history`（XDGに移行済み）
+
 ## [0.7.0] - 2025-07-25
 
 ### Added
