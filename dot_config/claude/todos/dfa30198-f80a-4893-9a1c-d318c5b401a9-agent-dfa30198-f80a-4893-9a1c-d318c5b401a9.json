@@ -1,0 +1,14 @@
+[
+  {
+    "content": "ESLintとPrettier関連ファイルを削除",
+    "status": "completed",
+    "priority": "high",
+    "id": "1"
+  },
+  {
+    "content": "削除後のgitステータス確認とコミット",
+    "status": "completed",
+    "priority": "medium",
+    "id": "2"
+  }
+]

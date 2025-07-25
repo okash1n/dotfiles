@@ -1,0 +1,26 @@
+[
+  {
+    "content": "innerHTMLの使用箇所をセキュアな方法に置き換え",
+    "status": "completed",
+    "priority": "high",
+    "id": "1"
+  },
+  {
+    "content": "Content Security Policy (CSP) の強化",
+    "status": "completed",
+    "priority": "high",
+    "id": "2"
+  },
+  {
+    "content": "入力値のサニタイゼーション強化",
+    "status": "completed",
+    "priority": "high",
+    "id": "3"
+  },
+  {
+    "content": "XSS攻撃対策のテスト追加",
+    "status": "completed",
+    "priority": "medium",
+    "id": "4"
+  }
+]

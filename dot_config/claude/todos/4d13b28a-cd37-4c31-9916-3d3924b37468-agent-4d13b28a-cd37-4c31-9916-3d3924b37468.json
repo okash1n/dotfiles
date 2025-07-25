@@ -1,0 +1,20 @@
+[
+  {
+    "content": "configs/.configの内容をconfigsに移動",
+    "status": "in_progress",
+    "priority": "high",
+    "id": "7"
+  },
+  {
+    "content": "シンボリックリンクの更新",
+    "status": "pending",
+    "priority": "high",
+    "id": "8"
+  },
+  {
+    "content": "パスの参照を修正",
+    "status": "pending",
+    "priority": "high",
+    "id": "9"
+  }
+]

@@ -1,0 +1,8 @@
+{
+  "name": "global-packages",
+  "version": "1.0.0",
+  "description": "NPM global packages backup",
+  "dependencies": {
+    "@anthropic-ai/claude-code": "1.0.57","ccusage": "15.5.0","corepack": "0.34.0","npm": "11.4.2","wrangler": "4.25.1"
+  }
+}

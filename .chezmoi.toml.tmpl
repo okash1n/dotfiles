@@ -1,0 +1,16 @@
+# chezmoi configuration template
+
+[data]
+    name = "{{ .name }}"
+    email = "{{ .email }}"
+
+[git]
+    autoCommit = false
+    autoPush = false
+
+[edit]
+    command = "vim"
+
+[hooks]
+    post.apply.command = "zsh"
+    post.apply.args = ["-c", "source ~/.zshenv && exec zsh"]

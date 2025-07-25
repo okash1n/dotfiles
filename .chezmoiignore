@@ -1,0 +1,22 @@
+# Files to ignore
+README.md
+CHANGELOG.md
+Makefile
+LICENSE
+.git
+.gitignore
+init.sh
+update.sh
+npm/
+configs/raycast/extensions/*/node_modules/
+configs/npm/*.202*
+configs/karabiner/automatic_backups/
+configs/zsh/*.zwc
+configs/zsh/.zsh_history
+configs/claude/ide/*.lock
+configs/claude/shell-snapshots/
+configs/claude/statsig/
+configs/claude/todos/
+configs/claude/projects/
+configs/claude/.claude.json
+configs/claude/.claude.json.backup
