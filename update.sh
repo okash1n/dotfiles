@@ -250,16 +250,43 @@ link_new_dotfiles() {
     # shopt -s nullglob を使用してグロブが展開されない場合の問題を回避
     shopt -s nullglob
     
-    # configsディレクトリ内のすべてのファイル/ディレクトリを処理
+    # .configディレクトリ以下のファイルは特別に処理
+    if [ -d "$CONFIG_DIR/.config" ]; then
+        mkdir -p "$HOME/.config"
+        for config_item in "$CONFIG_DIR/.config"/*; do
+            [ ! -e "$config_item" ] && continue
+            
+            TARGET="$HOME/.config/$(basename "$config_item")"
+            
+            # シンボリックリンクが存在しない場合のみ作成
+            if [ ! -L "$TARGET" ]; then
+                # 既存のファイル/ディレクトリがある場合は警告
+                if [ -e "$TARGET" ]; then
+                    print_info "Found existing non-symlink: $TARGET"
+                    print_info "Creating backup: ${TARGET}.backup"
+                    mv "$TARGET" "${TARGET}.backup"
+                fi
+                
+                # シンボリックリンクを作成
+                ln -snf "$config_item" "$TARGET"
+                print_success "Created symlink: .config/$(basename "$config_item") → $TARGET"
+                new_files_found=true
+                ((linked_count++))
+            fi
+        done
+    fi
+    
+    # その他のdotfilesは通常通り処理（ただし.configは除外）
     for item in "$CONFIG_DIR"/* "$CONFIG_DIR"/.*; do
-        # . と .. はスキップ
-        [ "$(basename "$item")" == "." ] || [ "$(basename "$item")" == ".." ] && continue
+        basename_item="$(basename "$item")"
+        # . と .. と .config はスキップ
+        [ "$basename_item" == "." ] || [ "$basename_item" == ".." ] || [ "$basename_item" == ".config" ] && continue
         
         # ファイルまたはディレクトリが存在するかチェック
         [ ! -e "$item" ] && continue
         
         # ターゲットのパス
-        TARGET="$HOME/$(basename "$item")"
+        TARGET="$HOME/$basename_item"
         
         # シンボリックリンクが存在しない場合のみ作成
         if [ ! -L "$TARGET" ]; then
@@ -272,7 +299,7 @@ link_new_dotfiles() {
             
             # シンボリックリンクを作成
             ln -snf "$item" "$TARGET"
-            print_success "Created symlink: $(basename "$item") → $TARGET"
+            print_success "Created symlink: $basename_item → $TARGET"
             new_files_found=true
             ((linked_count++))
         fi

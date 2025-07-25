@@ -9,7 +9,7 @@ function ensure_zcompiled {
     zcompile $1
   fi
 }
-ensure_zcompiled ~/.zshrc
+ensure_zcompiled ${ZDOTDIR:-$HOME}/.zshrc
 
 CACHE_DIR=${XDG_CACHE_HOME:-$HOME/.cache}
 SHELDON_CACHE="$CACHE_DIR/sheldon.zsh"

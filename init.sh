@@ -36,12 +36,24 @@ install_homebrew() {
 
 # 設定ファイルとディレクトリのシンボリックリンク作成
 link_dotfiles() {
-  echo "Creating symbolic links for config files and directories in ~/dotfiles/configs/..."
+  echo "Creating symbolic links for config files and directories..."
 
   CONFIG_DIR="$SCRIPT_DIR/configs"
+  
+  # .configディレクトリ以下のファイルは特別に処理
+  if [ -d "$CONFIG_DIR/.config" ]; then
+    mkdir -p "$HOME/.config"
+    for config_item in "$CONFIG_DIR/.config"/*; do
+      [ ! -e "$config_item" ] && continue
+      ln -snf "$config_item" "$HOME/.config/$(basename "$config_item")"
+    done
+  fi
+  
+  # その他のdotfilesは通常通り処理（ただし.configは除外）
   for item in "$CONFIG_DIR"/* "$CONFIG_DIR"/.*; do
-    [ "$(basename "$item")" == "." ] || [ "$(basename "$item")" == ".." ] && continue
-    ln -snf "$item" "$HOME/$(basename "$item")"
+    basename_item="$(basename "$item")"
+    [ "$basename_item" == "." ] || [ "$basename_item" == ".." ] || [ "$basename_item" == ".config" ] && continue
+    ln -snf "$item" "$HOME/$basename_item"
   done
 }
 
