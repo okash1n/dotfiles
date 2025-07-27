@@ -9,6 +9,7 @@ init.sh
 update.sh
 npm/
 configs/raycast/extensions/*/node_modules/
+**/node_modules/
 configs/npm/*.202*
 configs/karabiner/automatic_backups/
 configs/zsh/*.zwc
