@@ -12,10 +12,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - ARM64アーキテクチャ対応（Ubuntu ARM仮想マシンでテスト済み）
   - Homebrew on Linuxの適切なパス設定（`/home/linuxbrew`と`$HOME/.linuxbrew`）
   - Linux環境でのpowerlevel10kテーマパスの動的検出
-- Linux環境での自動更新機能（cron使用）
-  - cronの自動インストール（Ubuntu/RHEL系対応）
+- 自動更新機能をcronで統一（macOS/Linux共通）
+  - macOSでもlaunchdからcronに移行
+  - cronの自動インストール（Linux: Ubuntu/RHEL系対応）
   - 毎日12:00にchezmoi updateを実行
-  - macOSと同等の自動更新機能を実現
+  - Homebrewパスを自動検出して設定
 
 ### Changed
 - すべてのスクリプトでLinux用Homebrewパスを追加
@@ -36,6 +37,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - brew bundleのエラーをより寛容に処理
   - ghqのセグメンテーションフォルトに対する回避策を実装
   - Makefileでzshが見つからない場合のエラーハンドリングを改善
+- スクリプト内のバージョン表記を削除
+  - init.shからバージョン番号を削除（メンテナンス性向上）
+- 不要なファイルを削除
+  - init.sh.bak（古いバージョンのバックアップ）
 
 ## [0.9.0] - 2025-07-27
 

@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 set -e
 
-# 最小限のdotfiles初期化スクリプト (v0.9.1)
+# 最小限のdotfiles初期化スクリプト
 # このスクリプトはHomebrewとchezmoiのインストール、dotfilesの適用のみを行います
 # その他の設定はchezmoiのrun_onceスクリプトで実行されます
 
 SCRIPT_DIR=$(cd $(dirname $0); pwd)
 
-echo "=== Minimal Dotfiles Setup Script (v0.9.1) ==="
+echo "=== Minimal Dotfiles Setup Script ==="
 echo "This script will:"
 echo "1. Install Homebrew (if not installed)"
 echo "2. Install chezmoi"
