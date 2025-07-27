@@ -1,25 +1,22 @@
 #!/usr/bin/env bash
 set -e
 
-# SSH鍵とGitHub host keyの設定
+# SSH鍵の追加設定（init.shで基本設定は完了済み）
 
-echo "=== Setting up SSH configuration ==="
+echo "=== Additional SSH configuration ==="
 
-# SSHキーの存在確認
+# SSHキーの生成方法の詳細な案内
 if [ ! -f "$HOME/.ssh/id_ed25519" ] && [ ! -f "$HOME/.ssh/id_rsa" ]; then
-    echo "⚠️  Warning: No SSH key found in ~/.ssh/"
-    echo "You may have issues with private repositories."
-    echo "To generate a new SSH key, run:"
+    echo ""
+    echo "To generate a new SSH key for GitHub:"
     echo "  ssh-keygen -t ed25519 -C \"your_email@example.com\""
+    echo ""
+    echo "Then add it to your GitHub account:"
+    echo "  1. Copy the public key: cat ~/.ssh/id_ed25519.pub"
+    echo "  2. Go to GitHub Settings > SSH and GPG keys"
+    echo "  3. Click 'New SSH key' and paste the key"
     echo ""
 fi
 
-# GitHubのSSHホスト鍵を追加（初回接続時のプロンプトを回避）
-if [ ! -f "$HOME/.ssh/known_hosts" ] || ! grep -q "github.com" "$HOME/.ssh/known_hosts"; then
-    echo "Adding GitHub SSH host key..."
-    mkdir -p "$HOME/.ssh"
-    ssh-keyscan -t ed25519 github.com >> "$HOME/.ssh/known_hosts" 2>/dev/null
-    echo "✓ GitHub host key added"
-else
-    echo "✓ GitHub host key already configured"
-fi
+# その他のGitホスティングサービスのknown_hostsを追加する場合はここに記述
+# 例：GitLab, Bitbucketなど
