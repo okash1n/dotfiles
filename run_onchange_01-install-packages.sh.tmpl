@@ -30,8 +30,10 @@ fi
 
 # Aquaがインストールされている場合はaquaのパッケージもインストール
 if command -v aqua &> /dev/null; then
-    # AQUA_CONFIGのデフォルトを設定
-    AQUA_CONFIG="${AQUA_CONFIG:-$HOME/.config/aqua/aqua.yaml}"
+    # AQUA_CONFIGが設定されていない場合、一時的に設定
+    if [ -z "$AQUA_CONFIG" ]; then
+        export AQUA_CONFIG="$HOME/.config/aqua/aqua.yaml"
+    fi
     
     if [ -f "$AQUA_CONFIG" ]; then
         echo "Installing aqua packages..."

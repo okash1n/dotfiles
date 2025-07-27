@@ -48,8 +48,10 @@ fi
 
 # Aquaパッケージの更新
 if command -v aqua &> /dev/null; then
-    # AQUA_CONFIGのデフォルトを設定
-    AQUA_CONFIG="${AQUA_CONFIG:-$HOME/.config/aqua/aqua.yaml}"
+    # AQUA_CONFIGが設定されていない場合、一時的に設定
+    if [ -z "$AQUA_CONFIG" ]; then
+        export AQUA_CONFIG="$HOME/.config/aqua/aqua.yaml"
+    fi
     
     # aqua.yamlが存在する場合のみ実行
     if [ -f "$AQUA_CONFIG" ]; then
@@ -61,9 +63,7 @@ if command -v aqua &> /dev/null; then
     else
         echo ""
         echo "⚠️  Aqua configuration not found at: $AQUA_CONFIG"
-        echo "    Current directory: $(pwd)"
-        echo "    HOME: $HOME"
-        ls -la "$HOME/.config/aqua/" 2>/dev/null || echo "    Directory $HOME/.config/aqua/ does not exist"
+        echo "    Skipping aqua update."
     fi
 fi
 
