@@ -18,15 +18,11 @@ okash1nのdotfiles（令和最新版）
    # 出力をコピーしてGitHubに登録: https://github.com/settings/keys
    ```
 
+**注意**: 以下のOS別の準備は、init.shスクリプトが自動的に確認・インストールします：
+
 2. **OS別の準備**:
-   - **macOSの場合**: Xcodeコマンドラインツールをインストール
-     ```bash
-     xcode-select --install
-     ```
-   - **Linuxの場合**: 基本的なビルドツールをインストール（自動で行われますが、必要に応じて）
-     ```bash
-     sudo apt-get update && sudo apt-get install build-essential  # Ubuntu/Debian
-     ```
+   - **macOSの場合**: Xcodeコマンドラインツール（自動でインストールプロンプトが表示されます）
+   - **Linuxの場合**: ビルドツール（build-essential等が自動インストールされます）
 
 ### セットアップ
 

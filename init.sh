@@ -159,13 +159,47 @@ if ! command -v brew &> /dev/null; then
     echo ""
     echo "=== Installing Homebrew ==="
     
-    # OS別の注意事項を表示
+    # OS別の前提条件確認と自動インストール
     if [ "$(uname)" == "Darwin" ]; then
-        echo "Note: Homebrew requires Xcode Command Line Tools."
-        echo "If prompted, please install them and run this script again."
+        echo "Checking for Xcode Command Line Tools..."
+        if ! xcode-select -p &> /dev/null; then
+            echo "Installing Xcode Command Line Tools..."
+            echo "This may take a few minutes. Please follow the prompts."
+            xcode-select --install
+            echo ""
+            echo "⚠️  After installation completes, please run this script again."
+            exit 1
+        else
+            echo "✓ Xcode Command Line Tools are installed"
+        fi
     elif [ "$(uname)" == "Linux" ]; then
-        echo "Note: Homebrew on Linux may require additional dependencies."
-        echo "The installer will attempt to install them automatically."
+        echo "Checking for build dependencies..."
+        
+        # build-essentialのインストール確認と自動インストール
+        if command -v apt-get &> /dev/null; then
+            # Debian/Ubuntu系
+            if ! dpkg -l build-essential &> /dev/null; then
+                echo "Installing build-essential..."
+                sudo apt-get update && sudo apt-get install -y build-essential curl git
+                echo "✓ Build dependencies installed"
+            else
+                echo "✓ build-essential is already installed"
+            fi
+        elif command -v yum &> /dev/null; then
+            # RHEL/CentOS系
+            if ! rpm -q gcc gcc-c++ make &> /dev/null; then
+                echo "Installing development tools..."
+                sudo yum groupinstall -y "Development Tools"
+                sudo yum install -y curl git
+                echo "✓ Build dependencies installed"
+            else
+                echo "✓ Development tools are already installed"
+            fi
+        else
+            echo "⚠️  Could not detect package manager. Please install build tools manually:"
+            echo "   For Debian/Ubuntu: sudo apt-get install build-essential curl git"
+            echo "   For RHEL/CentOS: sudo yum groupinstall 'Development Tools'"
+        fi
     fi
     
     # NONINTERACTIVE=1でプロンプトをスキップ
