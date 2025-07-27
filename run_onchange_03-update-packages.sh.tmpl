@@ -6,6 +6,12 @@ set -e
 # hash: {{ include "dot_Brewfile" | sha256sum }}
 # hash: {{ include "dot_config/npm/global-packages.json" | sha256sum }}
 
+# 初回実行時はスキップ（init.shで既に実行済みのため）
+if [ ! -f "$HOME/.config/chezmoi/.chezmoi_initialized" ]; then
+    echo "Skipping package updates (handled by init.sh)..."
+    exit 0
+fi
+
 echo "=== Updating system packages ==="
 
 # Homebrewのパスを設定
@@ -15,6 +21,11 @@ elif [ -f "/usr/local/bin/brew" ]; then
     eval "$(/usr/local/bin/brew shellenv)"
 elif [ -f "/home/linuxbrew/.linuxbrew/bin/brew" ]; then
     eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+fi
+
+# aqua用のパスを設定（まだ設定されていない場合のみ）
+if [[ ":$PATH:" != *":$HOME/.local/share/aquaproj-aqua/bin:"* ]]; then
+    export PATH="$HOME/.local/share/aquaproj-aqua/bin:$PATH"
 fi
 
 # Homebrewの更新
@@ -43,9 +54,15 @@ fi
 
 # Aquaパッケージの更新
 if command -v aqua &> /dev/null; then
-    echo ""
-    echo "Updating Aqua packages..."
-    aqua update
+    # aqua.yamlが存在する場合のみ実行
+    if [ -f "$HOME/.config/aqua/aqua.yaml" ] || [ -f "$AQUA_CONFIG" ]; then
+        echo ""
+        echo "Updating Aqua packages..."
+        aqua update
+    else
+        echo ""
+        echo "⚠️  Aqua is installed but no configuration file found. Skipping aqua update."
+    fi
 fi
 
 echo ""

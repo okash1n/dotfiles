@@ -5,6 +5,55 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.0] - 2025-07-27
+
+### Added
+- 完全自動化された初期セットアップ
+  - パスワード入力を最初の1回のみに統合（sudo認証）
+  - Homebrewの非対話的インストール（`NONINTERACTIVE=1`）
+  - GitHubのSSHホスト鍵を自動追加（known_hosts）
+  - プライベートリポジトリのSSHクローン対応
+- 初回実行時の最適化
+  - run_onchangeスクリプトの初回スキップ機能（`.chezmoi_initialized`フラグ）
+  - PATH設定の問題を回避
+  - 実行順序の最適化によるsudoタイムアウト回避
+- プライベートアセット管理機能
+  - `ghq`を使用したプライベートリポジトリの自動クローン
+  - VSCode拡張機能（dracula-pro.vsix）の自動インストール
+- セットアップ完了後の自動zsh起動
+  - `make init`実行後も自動的にzshセッションを開始
+  - 設定済み環境がすぐに使用可能
+
+### Changed
+- `/etc/zshenv`のZDOTDIR設定を早期実行に変更
+  - Brewパッケージインストール前に実行してsudoタイムアウトを防止
+- chezmoiテンプレート変数を固定値に変更
+  - 初回実行時のGit設定読み取りを削除
+  - 個人リポジトリ用の固定値を使用
+- エラーハンドリングの改善
+  - makeからの実行を検出してexec zshの挙動を調整
+  - エラートラップとexitステータスの明示化
+
+### Fixed
+- Brewfileの問題修正
+  - 非推奨の`homebrew/bundle` tapを削除
+  - 有料拡張機能のエラーを解消
+  - jqパッケージを追加（NPMスクリプトで必要）
+- run_onchangeスクリプトのPATH問題を修正
+  - 各スクリプトで必要なPATH設定を追加
+  - aqua設定ファイルの存在チェックを追加
+  - PATH重複を防ぐチェック機能
+- その他の修正
+  - Raycast node_modulesシンボリックリンクを削除
+  - LaunchAgentsディレクトリの自動作成
+  - 状態管理ファイルをgitignoreに追加
+
+### Documentation
+- READMEを更新
+  - v0.9.0の新機能を反映
+  - 完全自動セットアップについての説明を追加
+  - バージョンバッジを更新
+
 ## [0.8.5] - 2025-07-25
 
 ### Added

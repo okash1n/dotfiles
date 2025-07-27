@@ -7,6 +7,10 @@ configs/claude/projects/*/*.jsonl
 configs/claude/.claude.json
 configs/claude/.claude.json.backup
 
+# Chezmoi
+configs/chezmoi/.chezmoi_initialized
+configs/chezmoi/chezmoistate.boltdb
+
 # でも、プロジェクト設定とログは保持
 !configs/claude/CLAUDE.md
 

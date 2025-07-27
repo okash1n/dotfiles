@@ -4,6 +4,12 @@ set -e
 # このスクリプトはBrewfileの内容が変更されたときに実行されます
 # hash: {{ include "dot_Brewfile" | sha256sum }}
 
+# 初回実行時はスキップ（init.shで既に実行済みのため）
+if [ ! -f "$HOME/.config/chezmoi/.chezmoi_initialized" ]; then
+    echo "Skipping package installation (handled by init.sh)..."
+    exit 0
+fi
+
 echo "Installing/updating Homebrew packages..."
 
 # Homebrewのパスを設定
@@ -23,8 +29,13 @@ else
     echo "Warning: Brewfile not found at ~/.Brewfile"
 fi
 
+# aqua用のパスを設定（まだ設定されていない場合のみ）
+if [[ ":$PATH:" != *":$HOME/.local/share/aquaproj-aqua/bin:"* ]]; then
+    export PATH="$HOME/.local/share/aquaproj-aqua/bin:$PATH"
+fi
+
 # Aquaがインストールされている場合はaquaのパッケージもインストール
-if command -v aqua &> /dev/null; then
+if command -v aqua &> /dev/null && [ -f "$HOME/.config/aqua/aqua.yaml" ]; then
     echo "Installing aqua packages..."
     aqua i -a
 fi

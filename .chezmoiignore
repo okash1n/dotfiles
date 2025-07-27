@@ -9,6 +9,9 @@ init.sh
 update.sh
 npm/
 configs/raycast/extensions/*/node_modules/
+configs/raycast/extensions/node_modules
+**/node_modules/
+**/node_modules
 configs/npm/*.202*
 configs/karabiner/automatic_backups/
 configs/zsh/*.zwc
@@ -20,3 +23,5 @@ configs/claude/todos/
 configs/claude/projects/
 configs/claude/.claude.json
 configs/claude/.claude.json.backup
+configs/chezmoi/.chezmoi_initialized
+configs/chezmoi/chezmoistate.boltdb

@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -e
 
+# エラーが発生した場合のトラップを設定
+trap 'echo "Error occurred at line $LINENO, exit code: $?"; exit 0' ERR
+
 # このスクリプトは新しいマシンでdotfilesをセットアップするための初期化スクリプトです
 # 前提条件：
 # 1. GitHubにSSHキーが登録済み
@@ -21,6 +24,44 @@ if [ ! -f "$HOME/.ssh/id_ed25519" ] && [ ! -f "$HOME/.ssh/id_rsa" ]; then
     echo "⚠️  Warning: No SSH key found in ~/.ssh/"
     echo "You may have issues with private repositories."
     echo ""
+fi
+
+# GitHubのSSHホスト鍵を追加（初回接続時のプロンプトを回避）
+if [ ! -f "$HOME/.ssh/known_hosts" ] || ! grep -q "github.com" "$HOME/.ssh/known_hosts"; then
+    echo "Adding GitHub SSH host key..."
+    mkdir -p "$HOME/.ssh"
+    ssh-keyscan -t ed25519 github.com >> "$HOME/.ssh/known_hosts" 2>/dev/null
+    echo "✓ GitHub host key added"
+fi
+
+# sudo認証を最初に要求（必要な場合）
+NEEDS_SUDO=false
+if [ ! -f "/etc/zshenv" ] || ! grep -q "ZDOTDIR=" "/etc/zshenv"; then
+    NEEDS_SUDO=true
+fi
+if ! command -v brew &> /dev/null; then
+    NEEDS_SUDO=true
+fi
+
+if [ "$NEEDS_SUDO" = true ]; then
+    echo "This script requires administrator privileges for initial setup."
+    echo "Please enter your password when prompted."
+    sudo -v
+    
+    # sudoのタイムスタンプを定期的に更新（バックグラウンドで）
+    while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
+    SUDO_PID=$!
+    
+    # 少し待機してsudoが確実に有効になるまで待つ
+    sleep 1
+fi
+
+# /etc/zshenvにZDOTDIRを設定（早い段階で実行）
+if [ "$NEEDS_SUDO" = true ] && ([ ! -f "/etc/zshenv" ] || ! grep -q "ZDOTDIR=" "/etc/zshenv"); then
+    echo ""
+    echo "=== Setting up ZDOTDIR in /etc/zshenv ==="
+    echo 'export ZDOTDIR="$HOME/.config/zsh"' | sudo tee -a /etc/zshenv > /dev/null
+    echo "✓ ZDOTDIR configured in /etc/zshenv"
 fi
 
 # Rosettaのインストール (Apple Siliconの場合)
@@ -59,20 +100,19 @@ setup_homebrew_path
 if ! command -v brew &> /dev/null; then
     echo ""
     echo "=== Installing Homebrew ==="
-    if [ -t 0 ]; then
-        # 対話的な環境
-        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-    else
-        # 非対話的な環境
-        echo "❌ Error: Homebrew installation requires an interactive terminal"
-        echo "Please install Homebrew manually first:"
-        echo "  /bin/bash -c \"\$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\""
-        exit 1
-    fi
+    # NONINTERACTIVE=1でプロンプトをスキップ
+    NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
     
     # 新しくインストールしたHomebrewのパスを設定
     setup_homebrew_path
-    echo "✓ Homebrew installed"
+    
+    # Homebrewが正しくインストールされたか確認
+    if command -v brew &> /dev/null; then
+        echo "✓ Homebrew installed"
+    else
+        echo "❌ Error: Homebrew installation failed"
+        exit 1
+    fi
 else
     echo "✓ Homebrew is already installed"
 fi
@@ -98,8 +138,49 @@ fi
 # chezmoiでdotfilesを適用
 echo ""
 echo "=== Applying dotfiles with chezmoi ==="
+
+# chezmoi用の設定ファイルを一時的に作成（固定値を使用）
+CHEZMOI_CONFIG_DIR="$HOME/.config/chezmoi"
+mkdir -p "$CHEZMOI_CONFIG_DIR"
+
+cat > "$CHEZMOI_CONFIG_DIR/chezmoi.yaml" <<EOF
+data:
+  name: "okash1n"
+  email: "48118431+okash1n@users.noreply.github.com"
+EOF
+
 chezmoi init --source "$SCRIPT_DIR" --apply
 echo "✓ Dotfiles applied"
+
+# chezmoi初期化完了フラグを作成
+mkdir -p "$HOME/.config/chezmoi"
+touch "$HOME/.config/chezmoi/.chezmoi_initialized"
+
+# プライベートアセットのインストール（VSCode拡張機能など）
+echo ""
+echo "=== Installing private assets ==="
+if [ -d "$HOME/ghq/github.com/okash1n/dracula-pro" ]; then
+    echo "Found dracula-pro repository"
+    if [ -f "$HOME/ghq/github.com/okash1n/dracula-pro/themes/visual-studio-code/dracula-pro.vsix" ]; then
+        echo "Installing Dracula Pro theme..."
+        code --install-extension "$HOME/ghq/github.com/okash1n/dracula-pro/themes/visual-studio-code/dracula-pro.vsix"
+        echo "✓ Dracula Pro theme installed"
+    fi
+else
+    # ghqでクローン（SSHを明示的に使用）
+    if command -v ghq &> /dev/null; then
+        echo "Cloning dracula-pro repository..."
+        ghq get git@github.com:okash1n/dracula-pro.git
+        if [ -f "$HOME/ghq/github.com/okash1n/dracula-pro/themes/visual-studio-code/dracula-pro.vsix" ]; then
+            echo "Installing Dracula Pro theme..."
+            code --install-extension "$HOME/ghq/github.com/okash1n/dracula-pro/themes/visual-studio-code/dracula-pro.vsix"
+            echo "✓ Dracula Pro theme installed"
+        fi
+    else
+        echo "⚠️  ghq or gh not available. Skipping private assets installation."
+        echo "   To install manually: ghq get okash1n/dracula-pro"
+    fi
+fi
 
 echo ""
 echo "=== Setup Complete! ==="
@@ -114,12 +195,24 @@ echo "  chezmoi cd         # Go to chezmoi source directory"
 echo "  chezmoi add <file> # Add a new file to chezmoi"
 echo ""
 
-# zshがデフォルトシェルでない場合は案内
-if [ "$SHELL" != "$(which zsh)" ]; then
-    echo "To set zsh as your default shell:"
-    echo '  echo "$(which zsh)" | sudo tee -a /etc/shells'
-    echo '  chsh -s "$(which zsh)"'
-    echo ""
+# zshのパスを/etc/shellsに追加するためのコマンドと、デフォルトシェルに設定するコマンドの案内
+echo "To add zsh to /etc/shells and set it as your default shell, run the following commands:"
+echo 'echo "$(which zsh)" | sudo tee -a /etc/shells'
+echo 'chsh -s "$(which zsh)"'
+
+# sudoのバックグラウンドプロセスをクリーンアップ
+if [ ! -z "$SUDO_PID" ]; then
+    kill $SUDO_PID 2>/dev/null || true
 fi
 
-echo "Please restart your terminal to ensure all changes take effect."
+# 親プロセスがmakeの場合は、execを使わない
+if [ "$1" != "--no-exec" ]; then
+    # 直接実行された場合のみzshを起動
+    if [ -z "$MAKE" ] && [ -z "$MAKELEVEL" ]; then
+        # zshを再実行することで、.zprofileなどを読み込ませる
+        exec zsh -l
+    fi
+fi
+
+# makeから実行された場合は正常終了を明示
+exit 0
