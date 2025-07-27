@@ -23,3 +23,5 @@ configs/claude/todos/
 configs/claude/projects/
 configs/claude/.claude.json
 configs/claude/.claude.json.backup
+configs/chezmoi/.chezmoi_initialized
+configs/chezmoi/chezmoistate.boltdb
