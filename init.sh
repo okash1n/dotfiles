@@ -162,12 +162,10 @@ echo "  chezmoi cd         # Go to chezmoi source directory"
 echo "  chezmoi add <file> # Add a new file to chezmoi"
 echo ""
 
-# zshがデフォルトシェルでない場合は案内
-if [ "$SHELL" != "$(which zsh)" ]; then
-    echo "To set zsh as your default shell:"
-    echo '  echo "$(which zsh)" | sudo tee -a /etc/shells'
-    echo '  chsh -s "$(which zsh)"'
-    echo ""
-fi
+# zshのパスを/etc/shellsに追加するためのコマンドと、デフォルトシェルに設定するコマンドの案内
+echo "To add zsh to /etc/shells and set it as your default shell, run the following commands:"
+echo 'echo "$(which zsh)" | sudo tee -a /etc/shells'
+echo 'chsh -s "$(which zsh)"'
 
-echo "Please restart your terminal to ensure all changes take effect."
+# zshを再実行することで、.zprofileなどを読み込ませる
+exec zsh -l
