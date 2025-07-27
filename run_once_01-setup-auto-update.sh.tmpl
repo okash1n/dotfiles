@@ -6,6 +6,12 @@ set -e
 
 echo "=== Setting up automatic updates ==="
 
+{{ if ne .chezmoi.os "darwin" -}}
+echo "Skipping automatic update setup (not on macOS)"
+echo "Note: You can manually run 'chezmoi update --apply' to update your dotfiles"
+exit 0
+{{- end }}
+
 # launchdの設定ファイルを作成
 PLIST_PATH="$HOME/Library/LaunchAgents/com.chezmoi.update.plist"
 
