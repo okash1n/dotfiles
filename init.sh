@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -e
 
+# エラーが発生した場合のトラップを設定
+trap 'echo "Error occurred at line $LINENO, exit code: $?"; exit 0' ERR
+
 # このスクリプトは新しいマシンでdotfilesをセットアップするための初期化スクリプトです
 # 前提条件：
 # 1. GitHubにSSHキーが登録済み
@@ -199,7 +202,7 @@ echo 'chsh -s "$(which zsh)"'
 
 # sudoのバックグラウンドプロセスをクリーンアップ
 if [ ! -z "$SUDO_PID" ]; then
-    kill $SUDO_PID 2>/dev/null
+    kill $SUDO_PID 2>/dev/null || true
 fi
 
 # 親プロセスがmakeの場合は、execを使わない
