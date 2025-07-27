@@ -23,6 +23,17 @@ if [ ! -f "$HOME/.ssh/id_ed25519" ] && [ ! -f "$HOME/.ssh/id_rsa" ]; then
     echo ""
 fi
 
+# sudo認証を最初に要求（必要な場合）
+if [ ! -f "/etc/zshenv" ] || ! grep -q "ZDOTDIR=" "/etc/zshenv" || ! command -v brew &> /dev/null; then
+    echo "This script requires administrator privileges for initial setup."
+    echo "Please enter your password when prompted."
+    sudo -v
+    
+    # sudoのタイムスタンプを定期的に更新（バックグラウンドで）
+    while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
+    SUDO_PID=$!
+fi
+
 # Rosettaのインストール (Apple Siliconの場合)
 if [[ "$(uname)" == "Darwin" && "$(uname -m)" == "arm64" ]]; then
     echo "=== Installing Rosetta ==="
@@ -178,6 +189,11 @@ echo ""
 echo "To add zsh to /etc/shells and set it as your default shell, run the following commands:"
 echo 'echo "$(which zsh)" | sudo tee -a /etc/shells'
 echo 'chsh -s "$(which zsh)"'
+
+# sudoのバックグラウンドプロセスをクリーンアップ
+if [ ! -z "$SUDO_PID" ]; then
+    kill $SUDO_PID 2>/dev/null
+fi
 
 # zshを再実行することで、.zprofileなどを読み込ませる
 exec zsh -l
