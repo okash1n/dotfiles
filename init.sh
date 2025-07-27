@@ -96,7 +96,17 @@ fi
 # chezmoiでdotfilesを適用
 echo ""
 echo "=== Applying dotfiles with chezmoi ==="
-chezmoi init --source "$SCRIPT_DIR" --apply
+# ユーザー情報を取得（gitの設定から取得を試みる）
+GIT_NAME=$(git config --global user.name 2>/dev/null || echo "")
+GIT_EMAIL=$(git config --global user.email 2>/dev/null || echo "")
+
+if [ -z "$GIT_NAME" ] || [ -z "$GIT_EMAIL" ]; then
+    echo "Git user information not found. Setting up chezmoi with defaults..."
+    chezmoi init --source "$SCRIPT_DIR" --apply --prompt-string name="User" --prompt-string email="user@example.com"
+else
+    echo "Using Git configuration: $GIT_NAME <$GIT_EMAIL>"
+    chezmoi init --source "$SCRIPT_DIR" --apply --prompt-string name="$GIT_NAME" --prompt-string email="$GIT_EMAIL"
+fi
 echo "✓ Dotfiles applied"
 
 # プライベートアセットのインストール（VSCode拡張機能など）
