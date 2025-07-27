@@ -9,6 +9,9 @@ echo "=== Setting up automatic updates ==="
 # launchdの設定ファイルを作成
 PLIST_PATH="$HOME/Library/LaunchAgents/com.chezmoi.update.plist"
 
+# LaunchAgentsディレクトリが存在しない場合は作成
+mkdir -p "$HOME/Library/LaunchAgents"
+
 # 既存の設定があれば削除
 if [ -f "$PLIST_PATH" ]; then
     launchctl unload "$PLIST_PATH" 2>/dev/null || true
