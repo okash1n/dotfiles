@@ -23,6 +23,14 @@ if [ ! -f "$HOME/.ssh/id_ed25519" ] && [ ! -f "$HOME/.ssh/id_rsa" ]; then
     echo ""
 fi
 
+# GitHubのSSHホスト鍵を追加（初回接続時のプロンプトを回避）
+if [ ! -f "$HOME/.ssh/known_hosts" ] || ! grep -q "github.com" "$HOME/.ssh/known_hosts"; then
+    echo "Adding GitHub SSH host key..."
+    mkdir -p "$HOME/.ssh"
+    ssh-keyscan -t ed25519 github.com >> "$HOME/.ssh/known_hosts" 2>/dev/null
+    echo "✓ GitHub host key added"
+fi
+
 # sudo認証を最初に要求（必要な場合）
 NEEDS_SUDO=false
 if [ ! -f "/etc/zshenv" ] || ! grep -q "ZDOTDIR=" "/etc/zshenv"; then
