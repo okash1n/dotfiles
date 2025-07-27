@@ -30,6 +30,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - ボトル（ビルド済みバイナリ）が利用できないパッケージの処理を改善
   - xdg-ninjaをARM64 Linux環境で除外（依存関係の問題）
   - brew bundleのエラーをより寛容に処理
+  - ghqのセグメンテーションフォルトに対する回避策を実装
+  - Makefileでzshが見つからない場合のエラーハンドリングを改善
 
 ## [0.9.0] - 2025-07-27
 

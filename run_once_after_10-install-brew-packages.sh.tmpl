@@ -36,6 +36,12 @@ if [ -f "$HOME/.Brewfile" ]; then
                     echo "Attempting to build $pkg from source..."
                     brew install --build-from-source $pkg 2>/dev/null || {
                         echo "⚠️  Failed to install $pkg. This package may not be critical."
+                        
+                        # ghの場合は代替インストール方法を提案
+                        if [ "$pkg" = "gh" ]; then
+                            echo "   Alternative: You can install gh directly from https://github.com/cli/cli/releases"
+                            echo "   or use: curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg"
+                        fi
                     }
                 fi
             done
