@@ -17,6 +17,9 @@ elif [ -f "/home/linuxbrew/.linuxbrew/bin/brew" ]; then
     eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 fi
 
+# aqua用のパスも設定
+export PATH="$HOME/.local/share/aquaproj-aqua/bin:$PATH"
+
 # Homebrewの更新
 if command -v brew &> /dev/null; then
     echo "Updating Homebrew..."
