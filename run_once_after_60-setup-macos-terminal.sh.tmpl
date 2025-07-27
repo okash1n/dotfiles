@@ -25,8 +25,17 @@ if [ -d "$DRACULA_PRO_PATH/themes/terminal-app" ]; then
         defaults write com.apple.Terminal "Default Window Settings" "Dracula Pro"
         defaults write com.apple.Terminal "Startup Window Settings" "Dracula Pro"
         
+        # 現在のウィンドウにも適用を試みる
+        osascript -e 'tell application "Terminal"
+            set current settings of window 1 to settings set "Dracula Pro"
+            set current settings of selected tab of window 1 to settings set "Dracula Pro"
+        end tell' 2>/dev/null || true
+        
         echo "✓ Dracula Pro theme installed for Terminal.app"
-        echo "  Note: You may need to restart Terminal.app for changes to take effect"
+        echo "  - New terminal windows will automatically use Dracula Pro theme"
+        echo "  - To apply to current window:"
+        echo "    1. Go to Shell > Use Settings As Default"
+        echo "    2. Or press Cmd+I and select 'Dracula Pro' from the profile list"
     else
         echo "⚠️  Dracula Pro theme file not found"
     fi
