@@ -32,32 +32,29 @@ fi
 # sudo認証を最初に要求（必要な場合）
 NEEDS_SUDO=false
 
-# macOSでHomebrewのインストールまたは/etc/zshenvの設定が必要な場合
+# Homebrewがインストールされていない場合
+if ! command -v brew &> /dev/null; then
+    NEEDS_SUDO=true
+fi
+
+# システムのzshenvパスを事前にチェック（man zshを使う前の簡易チェック）
+SYSTEM_ZSHENV_CHECK=""
 if [ "$(uname)" == "Darwin" ]; then
-    if [ ! -f "/etc/zshenv" ] || ! grep -q "ZDOTDIR=" "/etc/zshenv" ]; then
-        NEEDS_SUDO=true
-    fi
-    if ! command -v brew &> /dev/null; then
-        NEEDS_SUDO=true
-    fi
+    SYSTEM_ZSHENV_CHECK="/etc/zshenv"
 elif [ "$(uname)" == "Linux" ]; then
-    # Linuxでシステムのzshenvに書き込む必要がある場合
-    SYSTEM_ZSHENV_CHECK=""
     if [ -d "/etc/zsh" ]; then
         SYSTEM_ZSHENV_CHECK="/etc/zsh/zshenv"
     else
         SYSTEM_ZSHENV_CHECK="/etc/zshenv"
     fi
-    
-    # システムのzshenvが存在し、ZDOTDIR設定がなく、書き込み権限がない場合
-    if [ -f "$SYSTEM_ZSHENV_CHECK" ] && ! grep -q "ZDOTDIR=" "$SYSTEM_ZSHENV_CHECK" 2>/dev/null && [ ! -w "$SYSTEM_ZSHENV_CHECK" ]; then
-        NEEDS_SUDO=true
-    fi
-    
-    # Homebrewがインストールされていない場合（Linuxでも必要な場合がある）
-    if ! command -v brew &> /dev/null; then
-        # Linuxの場合、Homebrewのインストールにsudoは不要だが、依存関係のインストールで必要になる可能性がある
-        NEEDS_SUDO=true
+fi
+
+# システムのzshenvに書き込む必要があり、権限がない場合
+if [ -n "$SYSTEM_ZSHENV_CHECK" ]; then
+    if [ ! -f "$SYSTEM_ZSHENV_CHECK" ] || ! grep -q "ZDOTDIR=" "$SYSTEM_ZSHENV_CHECK" 2>/dev/null; then
+        if [ ! -w "$SYSTEM_ZSHENV_CHECK" ] && [ ! -w "$(dirname "$SYSTEM_ZSHENV_CHECK")" ]; then
+            NEEDS_SUDO=true
+        fi
     fi
 fi
 
@@ -74,69 +71,58 @@ if [ "$NEEDS_SUDO" = true ]; then
     sleep 1
 fi
 
-# /etc/zshenvにZDOTDIRを設定（macOSの場合のみ、早い段階で実行）
-if [ "$(uname)" == "Darwin" ]; then
-    if [ "$NEEDS_SUDO" = true ] && ([ ! -f "/etc/zshenv" ] || ! grep -q "ZDOTDIR=" "/etc/zshenv"); then
-        echo ""
-        echo "=== Setting up ZDOTDIR in /etc/zshenv ==="
-        echo 'export ZDOTDIR="$HOME/.config/zsh"' | sudo tee -a /etc/zshenv > /dev/null
-        echo "✓ ZDOTDIR configured in /etc/zshenv"
+# /etc/zshenvにZDOTDIRを設定（早い段階で実行）
+# システムのzshenv設定ファイルのパスを確認
+SYSTEM_ZSHENV=""
+
+# man zshからシステムのzshenvパスを取得（macOS/Linux共通）
+if command -v zsh &> /dev/null && command -v man &> /dev/null; then
+    # man zshの出力から/etc/zshenvまたは/etc/zsh/zshenvのパスを探す
+    ZSHENV_PATH=$(man zsh 2>/dev/null | grep -E '^\s*/etc/(zsh/)?zshenv' | head -1 | awk '{print $1}' || true)
+    if [ -n "$ZSHENV_PATH" ]; then
+        SYSTEM_ZSHENV="$ZSHENV_PATH"
     fi
-elif [ "$(uname)" == "Linux" ]; then
-    # Linuxの場合、システムのzshenv設定ファイルのパスを確認
-    SYSTEM_ZSHENV=""
-    
-    # man zshからシステムのzshenvパスを取得
-    if command -v zsh &> /dev/null && command -v man &> /dev/null; then
-        # man zshの出力から/etc/zshenvまたは/etc/zsh/zshenvのパスを探す
-        ZSHENV_PATH=$(man zsh 2>/dev/null | grep -E '^\s*/etc/(zsh/)?zshenv' | head -1 | awk '{print $1}' || true)
-        if [ -n "$ZSHENV_PATH" ]; then
-            SYSTEM_ZSHENV="$ZSHENV_PATH"
-        fi
-    fi
-    
-    # man zshで見つからない場合は一般的なパスをチェック
-    if [ -z "$SYSTEM_ZSHENV" ]; then
+fi
+
+# man zshで見つからない場合はOS別のデフォルトパスを使用
+if [ -z "$SYSTEM_ZSHENV" ]; then
+    if [ "$(uname)" == "Darwin" ]; then
+        SYSTEM_ZSHENV="/etc/zshenv"
+    elif [ "$(uname)" == "Linux" ]; then
         if [ -d "/etc/zsh" ]; then
             SYSTEM_ZSHENV="/etc/zsh/zshenv"
         else
             SYSTEM_ZSHENV="/etc/zshenv"
         fi
     fi
-    
-    # システムのzshenvファイルが存在し、書き込み可能な場合はそこに設定
+fi
+
+# システムのzshenvファイルにZDOTDIRを設定
+if [ -n "$SYSTEM_ZSHENV" ]; then
     if [ -f "$SYSTEM_ZSHENV" ] || [ -w "$(dirname "$SYSTEM_ZSHENV")" ]; then
         if ! grep -q "ZDOTDIR=" "$SYSTEM_ZSHENV" 2>/dev/null; then
-            if [ -w "$SYSTEM_ZSHENV" ] || [ -w "$(dirname "$SYSTEM_ZSHENV")" ]; then
-                # sudoが必要かチェック
-                if [ ! -w "$SYSTEM_ZSHENV" ] && [ ! -w "$(dirname "$SYSTEM_ZSHENV")" ]; then
-                    echo ""
-                    echo "=== Setting up ZDOTDIR in $SYSTEM_ZSHENV ==="
-                    echo "This requires administrator privileges."
-                    echo 'export ZDOTDIR="$HOME/.config/zsh"' | sudo tee -a "$SYSTEM_ZSHENV" > /dev/null
-                    echo "✓ ZDOTDIR configured in $SYSTEM_ZSHENV"
-                else
-                    echo ""
-                    echo "=== Setting up ZDOTDIR in $SYSTEM_ZSHENV ==="
-                    echo 'export ZDOTDIR="$HOME/.config/zsh"' >> "$SYSTEM_ZSHENV"
-                    echo "✓ ZDOTDIR configured in $SYSTEM_ZSHENV"
-                fi
-            else
-                # システムファイルに書き込めない場合は~/.zshenvを使用
+            # sudoが必要かチェック
+            if [ ! -w "$SYSTEM_ZSHENV" ] && [ ! -w "$(dirname "$SYSTEM_ZSHENV")" ]; then
                 echo ""
-                echo "=== Setting up ZDOTDIR in ~/.zshenv ==="
-                echo "Note: Could not write to $SYSTEM_ZSHENV, using ~/.zshenv instead"
-                echo 'export ZDOTDIR="$HOME/.config/zsh"' >> "$HOME/.zshenv"
-                echo "✓ ZDOTDIR configured in ~/.zshenv"
+                echo "=== Setting up ZDOTDIR in $SYSTEM_ZSHENV ==="
+                echo "This requires administrator privileges."
+                echo 'export ZDOTDIR="$HOME/.config/zsh"' | sudo tee -a "$SYSTEM_ZSHENV" > /dev/null
+                echo "✓ ZDOTDIR configured in $SYSTEM_ZSHENV"
+            else
+                echo ""
+                echo "=== Setting up ZDOTDIR in $SYSTEM_ZSHENV ==="
+                echo 'export ZDOTDIR="$HOME/.config/zsh"' >> "$SYSTEM_ZSHENV"
+                echo "✓ ZDOTDIR configured in $SYSTEM_ZSHENV"
             fi
         else
             echo "✓ ZDOTDIR already configured in $SYSTEM_ZSHENV"
         fi
     else
-        # システムのzshenvが存在しない場合は~/.zshenvを使用
+        # システムファイルに書き込めない場合は~/.zshenvを使用
         if [ ! -f "$HOME/.zshenv" ] || ! grep -q "ZDOTDIR=" "$HOME/.zshenv"; then
             echo ""
             echo "=== Setting up ZDOTDIR in ~/.zshenv ==="
+            echo "Note: Could not write to $SYSTEM_ZSHENV, using ~/.zshenv instead"
             echo 'export ZDOTDIR="$HOME/.config/zsh"' >> "$HOME/.zshenv"
             echo "✓ ZDOTDIR configured in ~/.zshenv"
         else
