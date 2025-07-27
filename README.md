@@ -1,6 +1,6 @@
 # dotfiles
 
-[![Version](https://img.shields.io/badge/version-0.8.5-blue.svg)](https://github.com/okash1n/dotfiles/releases)
+[![Version](https://img.shields.io/badge/version-0.9.0-blue.svg)](https://github.com/okash1n/dotfiles/releases)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
 okash1nのdotfiles（令和最新版）
@@ -35,10 +35,12 @@ make init  # または ./init.sh
 ```
 
 これにより以下が自動的に実行されます：
-- 🍺 Homebrewのインストール
+- 🍺 Homebrewのインストール（非対話的）
 - 📦 Brewfileに定義されたパッケージのインストール（chezmoi含む）
 - ⚙️ chezmoiによるdotfilesの適用
+- 🔐 プライベートアセットの自動インストール（VSCode拡張機能など）
 - 🔄 自動更新の設定（毎日12:00）
+- 🚀 設定済みのzshセッションを自動起動
 
 ## 📁 ディレクトリ構造
 
@@ -118,10 +120,12 @@ rm -rf ~/.local/share/chezmoi
 
 ## 📝 カスタマイズ
 
-### 個人情報の設定
+### 完全自動セットアップについて
 
-初回実行時に名前とメールアドレスを聞かれます。これらは以下のファイルに保存されます：
-- `~/.config/chezmoi/chezmoi.toml`
+v0.9.0より、初期セットアップは完全に自動化されました：
+- パスワード入力は最初の1回のみ（sudo権限が必要な場合）
+- Homebrewのインストールも確認プロンプトなし
+- GitHubのSSH認証も自動化（known_hosts自動追加）
 
 ### エディタの変更
 
