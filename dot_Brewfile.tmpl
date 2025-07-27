@@ -36,6 +36,7 @@ brew "xdg-ninja"
 brew "zsh"
 # Terraform
 brew "hashicorp/tap/terraform"
+{{ if eq .chezmoi.os "darwin" -}}
 # Plain-text editor for web pages, program source codes and more
 cask "coteditor"
 # Virtual monitor for screen sharing
@@ -47,6 +48,7 @@ cask "ghostty"
 cask "slack-cli"
 # Open-source code editor
 cask "visual-studio-code"
+{{- end }}
 vscode "alefragnani.project-manager"
 vscode "anthropic.claude-code"
 vscode "github.copilot"

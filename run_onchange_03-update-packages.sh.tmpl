@@ -3,7 +3,7 @@ set -e
 
 # このスクリプトはBrewfileやglobal-packages.jsonが変更されたときに
 # パッケージを更新するためのスクリプトです
-# hash: {{ include "dot_Brewfile" | sha256sum }}
+# hash: {{ include "dot_Brewfile.tmpl" | sha256sum }}
 # hash: {{ include "dot_config/npm/global-packages.json" | sha256sum }}
 
 echo "=== Updating system packages (configuration changed) ==="

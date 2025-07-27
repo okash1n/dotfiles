@@ -2,7 +2,7 @@
 set -e
 
 # このスクリプトはBrewfileの内容が変更されたときに実行されます
-# hash: {{ include "dot_Brewfile" | sha256sum }}
+# hash: {{ include "dot_Brewfile.tmpl" | sha256sum }}
 
 echo "=== Updating Homebrew packages (Brewfile changed) ==="
 
