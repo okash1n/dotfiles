@@ -17,6 +17,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - cronの自動インストール（Linux: Ubuntu/RHEL系対応）
   - 毎日12:00にchezmoi updateを実行
   - Homebrewパスを自動検出して設定
+- macOSターミナルの自動設定
+  - Terminal.appにDracula Proテーマを自動適用
+  - Hack Nerd Fontをデフォルトフォントに設定
+  - Ghosttyには既に設定済み
 
 ### Changed
 - すべてのスクリプトでLinux用Homebrewパスを追加

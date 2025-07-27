@@ -1,0 +1,73 @@
+#!/usr/bin/env bash
+set -e
+
+{{ if eq .chezmoi.os "darwin" -}}
+# macOSのターミナル設定（Dracula ProテーマとHack Nerd Font）
+
+echo "=== Setting up macOS Terminal ==="
+
+# Dracula Proテーマのインストール
+DRACULA_PRO_PATH="$HOME/ghq/github.com/okash1n/dracula-pro"
+if [ -d "$DRACULA_PRO_PATH/themes/terminal-app" ]; then
+    echo "Installing Dracula Pro theme for Terminal.app..."
+    
+    # デフォルトのテーマとして設定したいDracula Proのバリアント
+    THEME_FILE="$DRACULA_PRO_PATH/themes/terminal-app/Dracula Pro.terminal"
+    
+    if [ -f "$THEME_FILE" ]; then
+        # Terminal.appの設定をインポート
+        open "$THEME_FILE"
+        
+        # 少し待機してからデフォルトに設定
+        sleep 2
+        
+        # デフォルトプロファイルとして設定
+        defaults write com.apple.Terminal "Default Window Settings" "Dracula Pro"
+        defaults write com.apple.Terminal "Startup Window Settings" "Dracula Pro"
+        
+        echo "✓ Dracula Pro theme installed for Terminal.app"
+        echo "  Note: You may need to restart Terminal.app for changes to take effect"
+    else
+        echo "⚠️  Dracula Pro theme file not found"
+    fi
+else
+    echo "⚠️  Dracula Pro repository not found. Skipping Terminal.app theme setup."
+fi
+
+# Hack Nerd Fontの設定
+if [ -f "/Library/Fonts/HackNerdFont-Regular.ttf" ] || [ -f "$HOME/Library/Fonts/HackNerdFont-Regular.ttf" ]; then
+    echo "Setting Hack Nerd Font for Terminal.app..."
+    
+    # Terminal.appの設定に関する注意事項を表示
+    echo "⚠️  Note: Font settings for Terminal.app need to be set manually:"
+    echo "   1. Open Terminal > Settings (or Preferences on older macOS)"
+    echo "   2. Select 'Dracula Pro' profile"
+    echo "   3. Click 'Change...' under Font section"
+    echo "   4. Select 'Hack Nerd Font Mono', Size 13"
+    echo ""
+    echo "   This is a one-time setup that will persist across updates."
+    
+    # ウィンドウサイズなどの基本設定
+    defaults write com.apple.Terminal "Window Settings"."Dracula Pro".FontWidthSpacing 1.0
+    defaults write com.apple.Terminal "Window Settings"."Dracula Pro".FontHeightSpacing 1.0
+    defaults write com.apple.Terminal "Window Settings"."Dracula Pro".columnCount 120
+    defaults write com.apple.Terminal "Window Settings"."Dracula Pro".rowCount 30
+    
+    echo "✓ Terminal window settings updated"
+else
+    echo "⚠️  Hack Nerd Font not found. Please install it first with: brew install --cask font-hack-nerd-font"
+fi
+
+# Ghosttyの設定も確認
+if [ -f "$DRACULA_PRO_PATH/themes/ghostty/Dracula Pro.txt" ] && [ -f "$HOME/.config/ghostty/config" ]; then
+    echo ""
+    echo "Note: Dracula Pro theme is also available for Ghostty."
+    echo "      The theme file is at: $DRACULA_PRO_PATH/themes/ghostty/"
+    echo "      Your Ghostty config already includes the theme settings."
+fi
+
+echo ""
+echo "✓ macOS Terminal setup completed"
+{{- else }}
+echo "Skipping macOS Terminal setup (not on macOS)"
+{{- end }}
