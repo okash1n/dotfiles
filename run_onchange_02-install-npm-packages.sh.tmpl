@@ -6,10 +6,25 @@ set -e
 
 echo "Installing/updating NPM global packages..."
 
+# Homebrewのパスを設定（npm用）
+if [ -f "/opt/homebrew/bin/brew" ]; then
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+elif [ -f "/usr/local/bin/brew" ]; then
+    eval "$(/usr/local/bin/brew shellenv)"
+elif [ -f "/home/linuxbrew/.linuxbrew/bin/brew" ]; then
+    eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+fi
+
 # npmが利用可能かチェック
 if ! command -v npm &> /dev/null; then
     echo "npm is not installed. Skipping..."
     exit 0
+fi
+
+# jqが利用可能かチェック（Brewfileでインストールされているはず）
+if ! command -v jq &> /dev/null; then
+    echo "jq is not installed. Installing..."
+    brew install jq
 fi
 
 # global-packages.jsonが存在する場合

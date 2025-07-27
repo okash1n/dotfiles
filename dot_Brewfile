@@ -10,6 +10,8 @@ brew "chezmoi"
 brew "curl"
 # Command-line fuzzy finder written in Go
 brew "fzf"
+# Lightweight and flexible command-line JSON processor
+brew "jq"
 # GitHub command-line tool
 brew "gh"
 # Remote repository management made easy
