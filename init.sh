@@ -99,6 +99,32 @@ echo "=== Applying dotfiles with chezmoi ==="
 chezmoi init --source "$SCRIPT_DIR" --apply
 echo "✓ Dotfiles applied"
 
+# プライベートアセットのインストール（VSCode拡張機能など）
+echo ""
+echo "=== Installing private assets ==="
+if [ -d "$HOME/ghq/github.com/okash1n/dracula-pro" ]; then
+    echo "Found dracula-pro repository"
+    if [ -f "$HOME/ghq/github.com/okash1n/dracula-pro/themes/visual-studio-code/dracula-pro.vsix" ]; then
+        echo "Installing Dracula Pro theme..."
+        code --install-extension "$HOME/ghq/github.com/okash1n/dracula-pro/themes/visual-studio-code/dracula-pro.vsix"
+        echo "✓ Dracula Pro theme installed"
+    fi
+else
+    # ghqでクローン
+    if command -v ghq &> /dev/null && command -v gh &> /dev/null; then
+        echo "Cloning dracula-pro repository..."
+        ghq get okash1n/dracula-pro
+        if [ -f "$HOME/ghq/github.com/okash1n/dracula-pro/themes/visual-studio-code/dracula-pro.vsix" ]; then
+            echo "Installing Dracula Pro theme..."
+            code --install-extension "$HOME/ghq/github.com/okash1n/dracula-pro/themes/visual-studio-code/dracula-pro.vsix"
+            echo "✓ Dracula Pro theme installed"
+        fi
+    else
+        echo "⚠️  ghq or gh not available. Skipping private assets installation."
+        echo "   To install manually: ghq get okash1n/dracula-pro"
+    fi
+fi
+
 echo ""
 echo "=== Setup Complete! ==="
 echo ""
