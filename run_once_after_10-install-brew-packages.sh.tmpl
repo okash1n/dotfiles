@@ -30,11 +30,17 @@ if [[ ":$PATH:" != *":$HOME/.local/share/aquaproj-aqua/bin:"* ]]; then
 fi
 
 # Aquaがインストールされている場合はaquaのパッケージもインストール
-if command -v aqua &> /dev/null && [ -f "$HOME/.config/aqua/aqua.yaml" ]; then
-    echo "Installing aqua packages..."
-    aqua i -a || {
-        echo "⚠️  Aqua package installation failed. This is not critical."
-    }
-else
-    echo "⚠️  Aqua configuration not found. Skipping aqua package installation."
+if command -v aqua &> /dev/null; then
+    # AQUA_CONFIGのデフォルトを設定
+    AQUA_CONFIG="${AQUA_CONFIG:-$HOME/.config/aqua/aqua.yaml}"
+    
+    if [ -f "$AQUA_CONFIG" ]; then
+        echo "Installing aqua packages..."
+        aqua i -a || {
+            echo "⚠️  Aqua package installation failed. This is not critical."
+        }
+    else
+        echo "⚠️  Aqua configuration not found at: $AQUA_CONFIG"
+        echo "    Skipping aqua package installation."
+    fi
 fi
