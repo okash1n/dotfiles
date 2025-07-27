@@ -131,6 +131,10 @@ fi
 chezmoi init --source "$SCRIPT_DIR" --apply
 echo "✓ Dotfiles applied"
 
+# chezmoi初期化完了フラグを作成
+mkdir -p "$HOME/.config/chezmoi"
+touch "$HOME/.config/chezmoi/.chezmoi_initialized"
+
 # プライベートアセットのインストール（VSCode拡張機能など）
 echo ""
 echo "=== Installing private assets ==="

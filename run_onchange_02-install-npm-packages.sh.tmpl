@@ -4,6 +4,12 @@ set -e
 # このスクリプトはglobal-packages.jsonの内容が変更されたときに実行されます
 # hash: {{ include "dot_config/npm/global-packages.json" | sha256sum }}
 
+# 初回実行時はスキップ（init.shで既に実行済みのため）
+if [ ! -f "$HOME/.config/chezmoi/.chezmoi_initialized" ]; then
+    echo "Skipping NPM package installation (handled by init.sh)..."
+    exit 0
+fi
+
 echo "Installing/updating NPM global packages..."
 
 # Homebrewのパスを設定（npm用）
