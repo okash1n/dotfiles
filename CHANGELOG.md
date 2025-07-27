@@ -12,6 +12,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - ARM64アーキテクチャ対応（Ubuntu ARM仮想マシンでテスト済み）
   - Homebrew on Linuxの適切なパス設定（`/home/linuxbrew`と`$HOME/.linuxbrew`）
   - Linux環境でのpowerlevel10kテーマパスの動的検出
+- Linux環境での自動更新機能（cron使用）
+  - cronの自動インストール（Ubuntu/RHEL系対応）
+  - 毎日12:00にchezmoi updateを実行
+  - macOSと同等の自動更新機能を実現
 
 ### Changed
 - すべてのスクリプトでLinux用Homebrewパスを追加

@@ -99,15 +99,29 @@ chezmoi add ~/.Brewfile
 
 ### 自動更新
 
-**macOSの場合**: 毎日12:00に自動的に`chezmoi update --apply`が実行されます。
+毎日12:00に自動的に`chezmoi update --apply`が実行されます。
 
-手動で無効化する場合：
+**macOSの場合（launchd使用）**:
 ```bash
+# 無効化
 launchctl unload ~/Library/LaunchAgents/com.chezmoi.update.plist
 rm ~/Library/LaunchAgents/com.chezmoi.update.plist
+
+# ログ確認
+cat /tmp/chezmoi-update.log
 ```
 
-**Linuxの場合**: 手動で`chezmoi update --apply`を実行してください。
+**Linuxの場合（cron使用）**:
+```bash
+# 設定確認
+crontab -l
+
+# 無効化（crontab -eでchezmoi updateの行を削除）
+crontab -e
+
+# ログ確認
+cat /tmp/chezmoi-update.log
+```
 
 ## 🛠 トラブルシューティング
 

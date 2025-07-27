@@ -6,9 +6,40 @@ set -e
 
 echo "=== Setting up automatic updates ==="
 
-{{ if ne .chezmoi.os "darwin" -}}
-echo "Skipping automatic update setup (not on macOS)"
-echo "Note: You can manually run 'chezmoi update --apply' to update your dotfiles"
+{{ if eq .chezmoi.os "linux" -}}
+# Linux環境での自動更新設定（cron使用）
+echo "Setting up automatic updates for Linux..."
+
+# cronがインストールされているか確認
+if ! command -v crontab &> /dev/null; then
+    echo "⚠️  cron is not installed. Installing..."
+    if command -v apt-get &> /dev/null; then
+        sudo apt-get update && sudo apt-get install -y cron
+    elif command -v yum &> /dev/null; then
+        sudo yum install -y cronie
+    else
+        echo "⚠️  Could not install cron. Please install it manually."
+        echo "   You can set up automatic updates later by adding this to your crontab:"
+        echo "   0 12 * * * $(which chezmoi) update --apply >> /tmp/chezmoi-update.log 2>&1"
+        exit 0
+    fi
+fi
+
+# 既存のchezmoi更新エントリを削除
+crontab -l 2>/dev/null | grep -v "chezmoi update" | crontab - 2>/dev/null || true
+
+# 新しいcronエントリを追加
+(crontab -l 2>/dev/null || true; echo "0 12 * * * PATH=/home/linuxbrew/.linuxbrew/bin:$HOME/.linuxbrew/bin:/usr/local/bin:/usr/bin:/bin $(which chezmoi) update --apply >> /tmp/chezmoi-update.log 2>&1") | crontab -
+
+echo "✓ Automatic daily updates configured"
+echo "  Updates will run daily at 12:00 PM"
+echo "  Logs: /tmp/chezmoi-update.log"
+echo ""
+echo "To disable automatic updates, run:"
+echo "  crontab -e # and remove the chezmoi update line"
+echo ""
+echo "To view current cron jobs, run:"
+echo "  crontab -l"
 exit 0
 {{- end }}
 
