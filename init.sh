@@ -235,10 +235,61 @@ echo "  chezmoi cd         # Go to chezmoi source directory"
 echo "  chezmoi add <file> # Add a new file to chezmoi"
 echo ""
 
-# zshのパスを/etc/shellsに追加するためのコマンドと、デフォルトシェルに設定するコマンドの案内
-echo "To add zsh to /etc/shells and set it as your default shell, run the following commands:"
-echo 'echo "$(which zsh)" | sudo tee -a /etc/shells'
-echo 'chsh -s "$(which zsh)"'
+# 追加手順の案内（実行環境に基づく）
+echo "=== Next steps ==="
+echo ""
+
+# Brewのパスを検出（グローバルに使用）
+BREW_PATH=""
+BREW_PREFIX=""
+if [ -f "/opt/homebrew/bin/brew" ]; then
+    BREW_PATH="/opt/homebrew/bin/brew"
+    BREW_PREFIX="/opt/homebrew"
+elif [ -f "/usr/local/bin/brew" ]; then
+    BREW_PATH="/usr/local/bin/brew"
+    BREW_PREFIX="/usr/local"
+elif [ -f "/home/linuxbrew/.linuxbrew/bin/brew" ]; then
+    BREW_PATH="/home/linuxbrew/.linuxbrew/bin/brew"
+    BREW_PREFIX="/home/linuxbrew/.linuxbrew"
+elif [ -f "$HOME/.linuxbrew/bin/brew" ]; then
+    BREW_PATH="$HOME/.linuxbrew/bin/brew"
+    BREW_PREFIX="$HOME/.linuxbrew"
+fi
+
+# Homebrewのパス設定が必要かチェック
+if ! command -v brew &> /dev/null && [ -n "$BREW_PATH" ]; then
+    echo "1. Add Homebrew to your PATH:"
+    
+    # 現在のシェルを検出
+    CURRENT_SHELL=$(basename "$SHELL")
+    case "$CURRENT_SHELL" in
+        bash)
+            echo "   echo 'eval \"\$(${BREW_PATH} shellenv)\"' >> ~/.bashrc"
+            echo "   eval \"\$(${BREW_PATH} shellenv)\""
+            ;;
+        zsh)
+            echo "   echo 'eval \"\$(${BREW_PATH} shellenv)\"' >> ~/.zshrc"
+            echo "   eval \"\$(${BREW_PATH} shellenv)\""
+            ;;
+        *)
+            echo "   Add Homebrew to your shell's configuration file:"
+            echo "   eval \"\$(${BREW_PATH} shellenv)\""
+            ;;
+    esac
+    echo ""
+fi
+
+# zshがインストールされたが、現在のシェルがzshでない場合
+ZSH_PATH="$(PATH="$BREW_PREFIX/bin:$PATH" which zsh 2>/dev/null || true)"
+if [ -n "$ZSH_PATH" ] && [ "$SHELL" != "$ZSH_PATH" ]; then
+    echo "2. Set zsh as your default shell:"
+    echo "   echo \"$ZSH_PATH\" | sudo tee -a /etc/shells"
+    echo "   chsh -s \"$ZSH_PATH\""
+    echo ""
+    echo "3. Start a new zsh session:"
+    echo "   zsh"
+    echo ""
+fi
 
 # 初期化フラグを削除（通常運用でrun_onchangeが動作するように）
 rm -f "$CHEZMOI_CONFIG_DIR/.chezmoi_initializing" 2>/dev/null || true
