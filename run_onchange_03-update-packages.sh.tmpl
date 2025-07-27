@@ -6,6 +6,12 @@ set -e
 # hash: {{ include "dot_Brewfile.tmpl" | sha256sum }}
 # hash: {{ include "dot_config/npm/global-packages.json" | sha256sum }}
 
+# 初回実行時はスキップ（run_onceスクリプトで既に実行済みのため）
+if [ -f "$HOME/.config/chezmoi/.chezmoi_initializing" ]; then
+    echo "Skipping package updates (handled by run_once scripts)..."
+    exit 0
+fi
+
 echo "=== Updating system packages (configuration changed) ==="
 
 # Homebrewのパスを設定

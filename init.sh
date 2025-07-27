@@ -212,6 +212,9 @@ data:
   email: "48118431+okash1n@users.noreply.github.com"
 EOF
 
+# 初期化フラグを作成（run_onchangeスクリプトの初回実行をスキップするため）
+touch "$CHEZMOI_CONFIG_DIR/.chezmoi_initializing"
+
 # chezmoiの初期化と適用
 echo "Initializing and applying dotfiles..."
 chezmoi init --source "$SCRIPT_DIR" --apply
@@ -236,6 +239,9 @@ echo ""
 echo "To add zsh to /etc/shells and set it as your default shell, run the following commands:"
 echo 'echo "$(which zsh)" | sudo tee -a /etc/shells'
 echo 'chsh -s "$(which zsh)"'
+
+# 初期化フラグを削除（通常運用でrun_onchangeが動作するように）
+rm -f "$CHEZMOI_CONFIG_DIR/.chezmoi_initializing" 2>/dev/null || true
 
 # sudoのバックグラウンドプロセスをクリーンアップ
 if [ ! -z "$SUDO_PID" ]; then
