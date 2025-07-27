@@ -135,29 +135,16 @@ fi
 # chezmoiでdotfilesを適用
 echo ""
 echo "=== Applying dotfiles with chezmoi ==="
-# ユーザー情報を取得（gitの設定から取得を試みる）
-GIT_NAME=$(git config --global user.name 2>/dev/null || echo "")
-GIT_EMAIL=$(git config --global user.email 2>/dev/null || echo "")
 
-# chezmoi用の設定ファイルを一時的に作成
+# chezmoi用の設定ファイルを一時的に作成（固定値を使用）
 CHEZMOI_CONFIG_DIR="$HOME/.config/chezmoi"
 mkdir -p "$CHEZMOI_CONFIG_DIR"
 
-if [ -z "$GIT_NAME" ] || [ -z "$GIT_EMAIL" ]; then
-    echo "Git user information not found. Setting up chezmoi with defaults..."
-    cat > "$CHEZMOI_CONFIG_DIR/chezmoi.yaml" <<EOF
+cat > "$CHEZMOI_CONFIG_DIR/chezmoi.yaml" <<EOF
 data:
-  name: "User"
-  email: "user@example.com"
+  name: "okash1n"
+  email: "48118431+okash1n@users.noreply.github.com"
 EOF
-else
-    echo "Using Git configuration: $GIT_NAME <$GIT_EMAIL>"
-    cat > "$CHEZMOI_CONFIG_DIR/chezmoi.yaml" <<EOF
-data:
-  name: "$GIT_NAME"
-  email: "$GIT_EMAIL"
-EOF
-fi
 
 chezmoi init --source "$SCRIPT_DIR" --apply
 echo "✓ Dotfiles applied"
