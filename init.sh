@@ -146,10 +146,10 @@ if [ -d "$HOME/ghq/github.com/okash1n/dracula-pro" ]; then
         echo "✓ Dracula Pro theme installed"
     fi
 else
-    # ghqでクローン
-    if command -v ghq &> /dev/null && command -v gh &> /dev/null; then
+    # ghqでクローン（SSHを明示的に使用）
+    if command -v ghq &> /dev/null; then
         echo "Cloning dracula-pro repository..."
-        ghq get okash1n/dracula-pro
+        ghq get git@github.com:okash1n/dracula-pro.git
         if [ -f "$HOME/ghq/github.com/okash1n/dracula-pro/themes/visual-studio-code/dracula-pro.vsix" ]; then
             echo "Installing Dracula Pro theme..."
             code --install-extension "$HOME/ghq/github.com/okash1n/dracula-pro/themes/visual-studio-code/dracula-pro.vsix"
