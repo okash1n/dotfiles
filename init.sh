@@ -231,7 +231,29 @@ echo "  chezmoi cd         # Go to chezmoi source directory"
 echo "  chezmoi add <file> # Add a new file to chezmoi"
 echo ""
 
+# zshのパスを/etc/shellsに追加するためのコマンドと、デフォルトシェルに設定するコマンドの案内
+echo "To add zsh to /etc/shells and set it as your default shell, run the following commands:"
+echo 'echo "$(which zsh)" | sudo tee -a /etc/shells'
+echo 'chsh -s "$(which zsh)"'
+
 # sudoのバックグラウンドプロセスをクリーンアップ
 if [ ! -z "$SUDO_PID" ]; then
     kill $SUDO_PID 2>/dev/null || true
 fi
+
+# 親プロセスがmakeの場合は、execを使わない
+if [ "$1" != "--no-exec" ]; then
+    # 直接実行された場合のみzshを起動
+    if [ -z "$MAKE" ] && [ -z "$MAKELEVEL" ]; then
+        # zshを再実行することで、.zprofileなどを読み込ませる
+        if command -v zsh &> /dev/null; then
+            exec zsh -l
+        else
+            echo ""
+            echo "⚠️  zsh is not installed. Please install it manually and re-run the shell."
+        fi
+    fi
+fi
+
+# makeから実行された場合は正常終了を明示
+exit 0
