@@ -1,6 +1,6 @@
 # dotfiles
 
-[![Version](https://img.shields.io/badge/version-0.9.0-blue.svg)](https://github.com/okash1n/dotfiles/releases)
+[![Version](https://img.shields.io/badge/version-0.9.2-blue.svg)](https://github.com/okash1n/dotfiles/releases)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
 okash1nのdotfiles（令和最新版）
@@ -18,10 +18,15 @@ okash1nのdotfiles（令和最新版）
    # 出力をコピーしてGitHubに登録: https://github.com/settings/keys
    ```
 
-2. **macOSの場合**: Xcodeコマンドラインツールをインストール
-   ```bash
-   xcode-select --install
-   ```
+2. **OS別の準備**:
+   - **macOSの場合**: Xcodeコマンドラインツールをインストール
+     ```bash
+     xcode-select --install
+     ```
+   - **Linuxの場合**: 基本的なビルドツールをインストール（自動で行われますが、必要に応じて）
+     ```bash
+     sudo apt-get update && sudo apt-get install build-essential  # Ubuntu/Debian
+     ```
 
 ### セットアップ
 
@@ -94,13 +99,15 @@ chezmoi add ~/.Brewfile
 
 ### 自動更新
 
-毎日12:00に自動的に`chezmoi update --apply`が実行されます。
+**macOSの場合**: 毎日12:00に自動的に`chezmoi update --apply`が実行されます。
 
 手動で無効化する場合：
 ```bash
 launchctl unload ~/Library/LaunchAgents/com.chezmoi.update.plist
 rm ~/Library/LaunchAgents/com.chezmoi.update.plist
 ```
+
+**Linuxの場合**: 手動で`chezmoi update --apply`を実行してください。
 
 ## 🛠 トラブルシューティング
 

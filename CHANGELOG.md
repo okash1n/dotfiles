@@ -5,6 +5,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.2] - 2025-07-27
+
+### Added
+- Ubuntu/Linux環境での完全サポート
+  - ARM64アーキテクチャ対応（Ubuntu ARM仮想マシンでテスト済み）
+  - Homebrew on Linuxの適切なパス設定（`/home/linuxbrew`と`$HOME/.linuxbrew`）
+  - Linux環境でのpowerlevel10kテーマパスの動的検出
+
+### Changed
+- すべてのスクリプトでLinux用Homebrewパスを追加
+  - `run_once_after_*.sh.tmpl`スクリプト群
+  - `run_onchange_*.sh.tmpl`スクリプト群
+  - `source.zsh`でのpowerlevel10kパス動的設定
+- README.mdをLinux対応に更新
+  - Linux環境での前提条件を追加
+  - 自動更新機能のOS別説明を追加
+
+### Fixed
+- Linux環境でのlaunchctlエラーを修正
+  - `run_once_01-setup-auto-update.sh.tmpl`でmacOS専用コマンドをスキップ
+  - launchdベースの自動更新をmacOSのみに限定
+
 ## [0.9.0] - 2025-07-27
 
 ### Added

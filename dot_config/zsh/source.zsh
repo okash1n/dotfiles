@@ -17,7 +17,16 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
-source /opt/homebrew/share/powerlevel10k/powerlevel10k.zsh-theme
+# powerlevel10kのパスを動的に設定
+if [ -f "/opt/homebrew/share/powerlevel10k/powerlevel10k.zsh-theme" ]; then
+    source /opt/homebrew/share/powerlevel10k/powerlevel10k.zsh-theme
+elif [ -f "/home/linuxbrew/.linuxbrew/share/powerlevel10k/powerlevel10k.zsh-theme" ]; then
+    source /home/linuxbrew/.linuxbrew/share/powerlevel10k/powerlevel10k.zsh-theme
+elif [ -f "$HOME/.linuxbrew/share/powerlevel10k/powerlevel10k.zsh-theme" ]; then
+    source $HOME/.linuxbrew/share/powerlevel10k/powerlevel10k.zsh-theme
+else
+    echo "Warning: powerlevel10k theme not found"
+fi
 
 # To customize prompt, run `p10k configure` or edit $ZDOTDIR/.p10k.zsh.
 [[ ! -f ${ZDOTDIR:-$HOME}/.p10k.zsh ]] || source ${ZDOTDIR:-$HOME}/.p10k.zsh
