@@ -215,5 +215,15 @@ if [ ! -z "$SUDO_PID" ]; then
     kill $SUDO_PID 2>/dev/null
 fi
 
-# zshを再実行することで、.zprofileなどを読み込ませる
-exec zsh -l
+# 親プロセスがmakeの場合は、execを使わない
+if [ "$1" != "--no-exec" ]; then
+    # 直接実行された場合のみzshを起動
+    if [ -z "$MAKE" ] && [ -z "$MAKELEVEL" ]; then
+        # zshを再実行することで、.zprofileなどを読み込ませる
+        exec zsh -l
+    else
+        echo ""
+        echo "To start using your new shell configuration, run:"
+        echo "  exec zsh -l"
+    fi
+fi
