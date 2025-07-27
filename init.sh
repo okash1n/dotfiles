@@ -63,16 +63,21 @@ if ! command -v brew &> /dev/null; then
         # 対話的な環境
         /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
     else
-        # 非対話的な環境
-        echo "❌ Error: Homebrew installation requires an interactive terminal"
-        echo "Please install Homebrew manually first:"
-        echo "  /bin/bash -c \"\$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\""
-        exit 1
+        # 非対話的な環境の場合、NONINTERACTIVE=1を使用
+        echo "Installing Homebrew in non-interactive mode..."
+        NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
     fi
     
     # 新しくインストールしたHomebrewのパスを設定
     setup_homebrew_path
-    echo "✓ Homebrew installed"
+    
+    # Homebrewが正しくインストールされたか確認
+    if command -v brew &> /dev/null; then
+        echo "✓ Homebrew installed"
+    else
+        echo "❌ Error: Homebrew installation failed"
+        exit 1
+    fi
 else
     echo "✓ Homebrew is already installed"
 fi
