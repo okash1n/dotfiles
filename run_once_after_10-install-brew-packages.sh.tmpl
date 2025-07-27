@@ -1,10 +1,9 @@
 #!/usr/bin/env bash
 set -e
 
-# このスクリプトはBrewfileの内容が変更されたときに実行されます
-# hash: {{ include "dot_Brewfile" | sha256sum }}
+# Brewfileからパッケージをインストール（初回のみ）
 
-echo "=== Updating Homebrew packages (Brewfile changed) ==="
+echo "=== Installing Homebrew packages from Brewfile ==="
 
 # Homebrewのパスを設定
 if [ -f "/opt/homebrew/bin/brew" ]; then
@@ -19,8 +18,10 @@ fi
 if [ -f "$HOME/.Brewfile" ]; then
     echo "Installing packages from Brewfile..."
     brew bundle --global
+    echo "✓ All Homebrew packages installed"
 else
-    echo "Warning: Brewfile not found at ~/.Brewfile"
+    echo "❌ Error: Brewfile not found at ~/.Brewfile"
+    exit 1
 fi
 
 # aqua用のパスを設定（まだ設定されていない場合のみ）
@@ -32,4 +33,5 @@ fi
 if command -v aqua &> /dev/null && [ -f "$HOME/.config/aqua/aqua.yaml" ]; then
     echo "Installing aqua packages..."
     aqua i -a
+    echo "✓ Aqua packages installed"
 fi

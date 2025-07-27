@@ -6,13 +6,7 @@ set -e
 # hash: {{ include "dot_Brewfile" | sha256sum }}
 # hash: {{ include "dot_config/npm/global-packages.json" | sha256sum }}
 
-# 初回実行時はスキップ（init.shで既に実行済みのため）
-if [ ! -f "$HOME/.config/chezmoi/.chezmoi_initialized" ]; then
-    echo "Skipping package updates (handled by init.sh)..."
-    exit 0
-fi
-
-echo "=== Updating system packages ==="
+echo "=== Updating system packages (configuration changed) ==="
 
 # Homebrewのパスを設定
 if [ -f "/opt/homebrew/bin/brew" ]; then

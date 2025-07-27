@@ -1,10 +1,9 @@
 #!/usr/bin/env bash
 set -e
 
-# このスクリプトはglobal-packages.jsonの内容が変更されたときに実行されます
-# hash: {{ include "dot_config/npm/global-packages.json" | sha256sum }}
+# NPMグローバルパッケージをインストール（初回のみ）
 
-echo "=== Updating NPM global packages (global-packages.json changed) ==="
+echo "=== Installing NPM global packages ==="
 
 # Homebrewのパスを設定（npm用）
 if [ -f "/opt/homebrew/bin/brew" ]; then
@@ -17,14 +16,14 @@ fi
 
 # npmが利用可能かチェック
 if ! command -v npm &> /dev/null; then
-    echo "npm is not installed. Skipping..."
+    echo "⚠️  npm is not installed. Skipping NPM package installation..."
     exit 0
 fi
 
-# jqが利用可能かチェック（Brewfileでインストールされているはず）
+# jqが利用可能かチェック
 if ! command -v jq &> /dev/null; then
-    echo "jq is not installed. Installing..."
-    brew install jq
+    echo "⚠️  jq is not installed. Cannot parse global-packages.json"
+    exit 0
 fi
 
 # global-packages.jsonが存在する場合
@@ -37,9 +36,10 @@ if [ -f "$HOME/.config/npm/global-packages.json" ]; then
     if [ -n "$PACKAGES" ]; then
         echo "Installing: $PACKAGES"
         npm install -g $PACKAGES
+        echo "✓ NPM global packages installed"
     else
         echo "No packages found in global-packages.json"
     fi
 else
-    echo "Warning: global-packages.json not found at ~/.config/npm/global-packages.json"
+    echo "⚠️  global-packages.json not found at ~/.config/npm/global-packages.json"
 fi
