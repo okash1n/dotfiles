@@ -210,3 +210,6 @@ if [ "$1" != "--no-exec" ]; then
         exec zsh -l
     fi
 fi
+
+# makeから実行された場合は正常終了を明示
+exit 0
