@@ -35,13 +35,8 @@ if [[ "$(uname)" == "Darwin" && "$(uname -m)" == "arm64" ]]; then
     fi
 fi
 
-# Homebrewのインストール
-if ! command -v brew &> /dev/null; then
-    echo ""
-    echo "=== Installing Homebrew ==="
-    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-    
-    # Homebrewのパスを設定
+# Homebrewのパスを設定（既にインストールされている場合のため）
+setup_homebrew_path() {
     if [ "$(uname)" == "Darwin" ]; then
         # Apple Silicon Mac
         if [ -f "/opt/homebrew/bin/brew" ]; then
@@ -55,6 +50,28 @@ if ! command -v brew &> /dev/null; then
         test -d ~/.linuxbrew && eval $(~/.linuxbrew/bin/brew shellenv)
         test -d /home/linuxbrew/.linuxbrew && eval $(/home/linuxbrew/.linuxbrew/bin/brew shellenv)
     fi
+}
+
+# まず既存のHomebrewを探す
+setup_homebrew_path
+
+# Homebrewのインストール
+if ! command -v brew &> /dev/null; then
+    echo ""
+    echo "=== Installing Homebrew ==="
+    if [ -t 0 ]; then
+        # 対話的な環境
+        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    else
+        # 非対話的な環境
+        echo "❌ Error: Homebrew installation requires an interactive terminal"
+        echo "Please install Homebrew manually first:"
+        echo "  /bin/bash -c \"\$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\""
+        exit 1
+    fi
+    
+    # 新しくインストールしたHomebrewのパスを設定
+    setup_homebrew_path
     echo "✓ Homebrew installed"
 else
     echo "✓ Homebrew is already installed"
@@ -63,9 +80,14 @@ fi
 # Brewfileからパッケージをインストール
 echo ""
 echo "=== Installing packages from Brewfile ==="
-# グローバルBrewfileからインストール
-brew bundle --global
-echo "✓ All packages installed"
+# リポジトリ内のBrewfileを使用
+if [ -f "$SCRIPT_DIR/dot_Brewfile" ]; then
+    brew bundle --file="$SCRIPT_DIR/dot_Brewfile"
+    echo "✓ All packages installed"
+else
+    echo "❌ Error: Brewfile not found at $SCRIPT_DIR/dot_Brewfile"
+    exit 1
+fi
 
 # chezmoiが正しくインストールされたか確認
 if ! command -v chezmoi &> /dev/null; then
