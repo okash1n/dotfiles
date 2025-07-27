@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+set -e
+
+# /etc/zshenvにZDOTDIRを設定（macOSのみ）
+
+{{ if eq .chezmoi.os "darwin" -}}
+echo "=== Setting up ZDOTDIR in /etc/zshenv ==="
+
+# /etc/zshenvにZDOTDIRが設定されているか確認
+if [ ! -f "/etc/zshenv" ] || ! grep -q "ZDOTDIR=" "/etc/zshenv"; then
+    echo "Setting up ZDOTDIR in /etc/zshenv..."
+    echo "This requires administrator privileges."
+    echo 'export ZDOTDIR="$HOME/.config/zsh"' | sudo tee -a /etc/zshenv > /dev/null
+    echo "✓ ZDOTDIR configured in /etc/zshenv"
+else
+    echo "✓ ZDOTDIR already configured in /etc/zshenv"
+fi
+{{- else }}
+echo "Skipping /etc/zshenv setup (not on macOS)"
+{{- end }}

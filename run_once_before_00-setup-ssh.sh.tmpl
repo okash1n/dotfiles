@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+set -e
+
+# SSH鍵とGitHub host keyの設定
+
+echo "=== Setting up SSH configuration ==="
+
+# SSHキーの存在確認
+if [ ! -f "$HOME/.ssh/id_ed25519" ] && [ ! -f "$HOME/.ssh/id_rsa" ]; then
+    echo "⚠️  Warning: No SSH key found in ~/.ssh/"
+    echo "You may have issues with private repositories."
+    echo "To generate a new SSH key, run:"
+    echo "  ssh-keygen -t ed25519 -C \"your_email@example.com\""
+    echo ""
+fi
+
+# GitHubのSSHホスト鍵を追加（初回接続時のプロンプトを回避）
+if [ ! -f "$HOME/.ssh/known_hosts" ] || ! grep -q "github.com" "$HOME/.ssh/known_hosts"; then
+    echo "Adding GitHub SSH host key..."
+    mkdir -p "$HOME/.ssh"
+    ssh-keyscan -t ed25519 github.com >> "$HOME/.ssh/known_hosts" 2>/dev/null
+    echo "✓ GitHub host key added"
+else
+    echo "✓ GitHub host key already configured"
+fi
