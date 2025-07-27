@@ -53,6 +53,14 @@ if [ "$NEEDS_SUDO" = true ]; then
     sleep 1
 fi
 
+# /etc/zshenvにZDOTDIRを設定（早い段階で実行）
+if [ "$NEEDS_SUDO" = true ] && ([ ! -f "/etc/zshenv" ] || ! grep -q "ZDOTDIR=" "/etc/zshenv"); then
+    echo ""
+    echo "=== Setting up ZDOTDIR in /etc/zshenv ==="
+    echo 'export ZDOTDIR="$HOME/.config/zsh"' | sudo tee -a /etc/zshenv > /dev/null
+    echo "✓ ZDOTDIR configured in /etc/zshenv"
+fi
+
 # Rosettaのインストール (Apple Siliconの場合)
 if [[ "$(uname)" == "Darwin" && "$(uname -m)" == "arm64" ]]; then
     echo "=== Installing Rosetta ==="
@@ -122,20 +130,6 @@ fi
 if ! command -v chezmoi &> /dev/null; then
     echo "❌ Error: chezmoi was not installed properly"
     exit 1
-fi
-
-# /etc/zshenvにZDOTDIRを設定（まだ設定されていない場合）
-if [ ! -f "/etc/zshenv" ] || ! grep -q "ZDOTDIR=" "/etc/zshenv"; then
-    echo ""
-    echo "=== Setting up ZDOTDIR in /etc/zshenv ==="
-    # sudo -n で非対話的に実行（既に認証済みの場合）
-    if sudo -n true 2>/dev/null; then
-        echo 'export ZDOTDIR="$HOME/.config/zsh"' | sudo tee -a /etc/zshenv > /dev/null
-    else
-        # 認証が必要な場合
-        echo 'export ZDOTDIR="$HOME/.config/zsh"' | sudo tee -a /etc/zshenv > /dev/null
-    fi
-    echo "✓ ZDOTDIR configured in /etc/zshenv"
 fi
 
 # chezmoiでdotfilesを適用
