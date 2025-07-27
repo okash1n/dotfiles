@@ -31,7 +31,9 @@ brew "tree"
 # Internet file retriever
 brew "wget"
 # Check your $HOME for unwanted files and directories
+{{ if not (and (eq .chezmoi.os "linux") (eq .chezmoi.arch "arm64")) -}}
 brew "xdg-ninja"
+{{- end }}
 # UNIX shell (command interpreter)
 brew "zsh"
 # Terraform

@@ -19,8 +19,36 @@ fi
 # Brewfileからパッケージをインストール
 if [ -f "$HOME/.Brewfile" ]; then
     echo "Installing packages from Brewfile..."
-    brew bundle --global
-    echo "✓ All Homebrew packages installed"
+    
+    # ARM64 Linux環境での特別な処理
+    if [ "$(uname)" == "Linux" ] && [ "$(uname -m)" == "aarch64" ]; then
+        echo "⚠️  Note: Running on ARM64 Linux. Some packages may need to be built from source."
+        echo "    This may take longer than usual."
+        
+        # brew bundleを実行（エラーが発生しても続行）
+        brew bundle --global || {
+            echo "⚠️  Some packages failed to install. This is expected on ARM64 Linux."
+            echo "    Attempting to install failed packages from source..."
+            
+            # 失敗しやすいパッケージをソースからインストール
+            for pkg in aqua fzf gh ghq; do
+                if ! command -v $pkg &> /dev/null; then
+                    echo "Attempting to build $pkg from source..."
+                    brew install --build-from-source $pkg 2>/dev/null || {
+                        echo "⚠️  Failed to install $pkg. This package may not be critical."
+                    }
+                fi
+            done
+            
+            # xdg-ninjaは依存関係の問題があるのでスキップ
+            echo "⚠️  Skipping xdg-ninja on ARM64 Linux due to dependency issues."
+        }
+    else
+        # その他の環境では通常通り実行
+        brew bundle --global
+    fi
+    
+    echo "✓ Homebrew package installation completed"
 else
     echo "❌ Error: Brewfile not found at ~/.Brewfile"
     exit 1

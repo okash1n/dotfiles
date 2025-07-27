@@ -26,7 +26,14 @@ fi
 # Brewfileからパッケージをインストール
 if [ -f "$HOME/.Brewfile" ]; then
     echo "Installing packages from Brewfile..."
-    brew bundle --global
+    
+    # ARM64 Linux環境での特別な処理
+    if [ "$(uname)" == "Linux" ] && [ "$(uname -m)" == "aarch64" ]; then
+        echo "⚠️  Note: Running on ARM64 Linux. Some packages may need to be built from source."
+        brew bundle --global || echo "⚠️  Some packages failed to install. This is expected on ARM64 Linux."
+    else
+        brew bundle --global
+    fi
 else
     echo "Warning: Brewfile not found at ~/.Brewfile"
 fi

@@ -26,6 +26,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Linux環境でのlaunchctlエラーを修正
   - `run_once_01-setup-auto-update.sh.tmpl`でmacOS専用コマンドをスキップ
   - launchdベースの自動更新をmacOSのみに限定
+- ARM64 Linux環境でのパッケージインストールエラーを修正
+  - ボトル（ビルド済みバイナリ）が利用できないパッケージの処理を改善
+  - xdg-ninjaをARM64 Linux環境で除外（依存関係の問題）
+  - brew bundleのエラーをより寛容に処理
 
 ## [0.9.0] - 2025-07-27
 
