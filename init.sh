@@ -70,7 +70,8 @@ setup_homebrew_path
 if ! command -v brew &> /dev/null; then
     echo ""
     echo "=== Installing Homebrew ==="
-    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    # NONINTERACTIVE=1でプロンプトをスキップ
+    NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
     
     # 新しくインストールしたHomebrewのパスを設定
     setup_homebrew_path
