@@ -24,7 +24,15 @@ if [ ! -f "$HOME/.ssh/id_ed25519" ] && [ ! -f "$HOME/.ssh/id_rsa" ]; then
 fi
 
 # sudo認証を最初に要求（必要な場合）
-if [ ! -f "/etc/zshenv" ] || ! grep -q "ZDOTDIR=" "/etc/zshenv" || ! command -v brew &> /dev/null; then
+NEEDS_SUDO=false
+if [ ! -f "/etc/zshenv" ] || ! grep -q "ZDOTDIR=" "/etc/zshenv"; then
+    NEEDS_SUDO=true
+fi
+if ! command -v brew &> /dev/null; then
+    NEEDS_SUDO=true
+fi
+
+if [ "$NEEDS_SUDO" = true ]; then
     echo "This script requires administrator privileges for initial setup."
     echo "Please enter your password when prompted."
     sudo -v
@@ -32,6 +40,9 @@ if [ ! -f "/etc/zshenv" ] || ! grep -q "ZDOTDIR=" "/etc/zshenv" || ! command -v 
     # sudoのタイムスタンプを定期的に更新（バックグラウンドで）
     while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
     SUDO_PID=$!
+    
+    # 少し待機してsudoが確実に有効になるまで待つ
+    sleep 1
 fi
 
 # Rosettaのインストール (Apple Siliconの場合)
@@ -109,7 +120,13 @@ fi
 if [ ! -f "/etc/zshenv" ] || ! grep -q "ZDOTDIR=" "/etc/zshenv"; then
     echo ""
     echo "=== Setting up ZDOTDIR in /etc/zshenv ==="
-    echo 'export ZDOTDIR="$HOME/.config/zsh"' | sudo tee -a /etc/zshenv > /dev/null
+    # sudo -n で非対話的に実行（既に認証済みの場合）
+    if sudo -n true 2>/dev/null; then
+        echo 'export ZDOTDIR="$HOME/.config/zsh"' | sudo tee -a /etc/zshenv > /dev/null
+    else
+        # 認証が必要な場合
+        echo 'export ZDOTDIR="$HOME/.config/zsh"' | sudo tee -a /etc/zshenv > /dev/null
+    fi
     echo "✓ ZDOTDIR configured in /etc/zshenv"
 fi
 
