@@ -17,8 +17,10 @@ elif [ -f "/home/linuxbrew/.linuxbrew/bin/brew" ]; then
     eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 fi
 
-# aqua用のパスも設定
-export PATH="$HOME/.local/share/aquaproj-aqua/bin:$PATH"
+# aqua用のパスを設定（まだ設定されていない場合のみ）
+if [[ ":$PATH:" != *":$HOME/.local/share/aquaproj-aqua/bin:"* ]]; then
+    export PATH="$HOME/.local/share/aquaproj-aqua/bin:$PATH"
+fi
 
 # Homebrewの更新
 if command -v brew &> /dev/null; then
