@@ -142,8 +142,11 @@ setup_homebrew_path() {
         fi
     elif [ "$(uname)" == "Linux" ]; then
         # Linux
-        test -d ~/.linuxbrew && eval $(~/.linuxbrew/bin/brew shellenv)
-        test -d /home/linuxbrew/.linuxbrew && eval $(/home/linuxbrew/.linuxbrew/bin/brew shellenv)
+        if [ -f "/home/linuxbrew/.linuxbrew/bin/brew" ]; then
+            eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+        elif [ -f "$HOME/.linuxbrew/bin/brew" ]; then
+            eval "$($HOME/.linuxbrew/bin/brew shellenv)"
+        fi
     fi
 }
 
@@ -155,10 +158,13 @@ if ! command -v brew &> /dev/null; then
     echo ""
     echo "=== Installing Homebrew ==="
     
-    # macOSの場合、Xcodeコマンドラインツールの確認を促す
+    # OS別の注意事項を表示
     if [ "$(uname)" == "Darwin" ]; then
         echo "Note: Homebrew requires Xcode Command Line Tools."
         echo "If prompted, please install them and run this script again."
+    elif [ "$(uname)" == "Linux" ]; then
+        echo "Note: Homebrew on Linux may require additional dependencies."
+        echo "The installer will attempt to install them automatically."
     fi
     
     # NONINTERACTIVE=1でプロンプトをスキップ
