@@ -1,4 +1,7 @@
-.PHONY: init
+.PHONY: init update
 
 init:
-	@sh ./init.sh; zsh -l
+	@bash ./init.sh --no-exec && exec zsh -l
+
+update:
+	@bash ./update.sh

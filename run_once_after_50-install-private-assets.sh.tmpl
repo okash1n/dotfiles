@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+set -e
+
+# プライベートアセットのインストール（VSCode拡張機能など）
+
+echo "=== Installing private assets ==="
+
+# dracula-proリポジトリの確認とVSCode拡張機能のインストール
+DRACULA_PRO_PATH="$HOME/ghq/github.com/okash1n/dracula-pro"
+
+if [ -d "$DRACULA_PRO_PATH" ]; then
+    echo "Found dracula-pro repository"
+else
+    # ghqが利用可能な場合はクローン
+    if command -v ghq &> /dev/null; then
+        echo "Cloning dracula-pro repository..."
+        ghq get git@github.com:okash1n/dracula-pro.git || {
+            echo "⚠️  Failed to clone dracula-pro repository."
+            echo "   Make sure you have SSH access to the repository."
+            exit 0  # エラーでも続行
+        }
+    else
+        echo "⚠️  ghq not available. Skipping dracula-pro installation."
+        echo "   To install manually: ghq get okash1n/dracula-pro"
+        exit 0
+    fi
+fi
+
+# VSCode拡張機能のインストール
+if [ -f "$DRACULA_PRO_PATH/themes/visual-studio-code/dracula-pro.vsix" ]; then
+    if command -v code &> /dev/null; then
+        echo "Installing Dracula Pro theme for VSCode..."
+        code --install-extension "$DRACULA_PRO_PATH/themes/visual-studio-code/dracula-pro.vsix"
+        echo "✓ Dracula Pro theme installed"
+    else
+        echo "⚠️  VSCode CLI not found. Skipping theme installation."
+        echo "   To install manually: code --install-extension $DRACULA_PRO_PATH/themes/visual-studio-code/dracula-pro.vsix"
+    fi
+else
+    echo "⚠️  Dracula Pro VSIX file not found."
+fi
+
+# その他のプライベートアセットがあればここに追加

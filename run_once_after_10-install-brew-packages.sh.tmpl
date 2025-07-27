@@ -1,16 +1,9 @@
 #!/usr/bin/env bash
 set -e
 
-# このスクリプトはBrewfileの内容が変更されたときに実行されます
-# hash: {{ include "dot_Brewfile.tmpl" | sha256sum }}
+# Brewfileからパッケージをインストール（初回のみ）
 
-# 初回実行時はスキップ（run_onceスクリプトで既に実行済みのため）
-if [ -f "$HOME/.config/chezmoi/.chezmoi_initializing" ]; then
-    echo "Skipping package installation (handled by run_once scripts)..."
-    exit 0
-fi
-
-echo "=== Updating Homebrew packages (Brewfile changed) ==="
+echo "=== Installing Homebrew packages from Brewfile ==="
 
 # Homebrewのパスを設定
 if [ -f "/opt/homebrew/bin/brew" ]; then
@@ -25,8 +18,10 @@ fi
 if [ -f "$HOME/.Brewfile" ]; then
     echo "Installing packages from Brewfile..."
     brew bundle --global
+    echo "✓ All Homebrew packages installed"
 else
-    echo "Warning: Brewfile not found at ~/.Brewfile"
+    echo "❌ Error: Brewfile not found at ~/.Brewfile"
+    exit 1
 fi
 
 # aqua用のパスを設定（まだ設定されていない場合のみ）
@@ -46,5 +41,8 @@ if command -v aqua &> /dev/null; then
         aqua i -a || {
             echo "⚠️  Aqua package installation failed. This is not critical."
         }
+    else
+        echo "⚠️  Aqua configuration not found at: $AQUA_CONFIG"
+        echo "    Skipping aqua package installation."
     fi
 fi

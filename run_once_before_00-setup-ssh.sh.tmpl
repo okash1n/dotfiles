@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+set -e
+
+# SSH鍵の追加設定（init.shで基本設定は完了済み）
+
+echo "=== Additional SSH configuration ==="
+
+# SSHキーの生成方法の詳細な案内
+if [ ! -f "$HOME/.ssh/id_ed25519" ] && [ ! -f "$HOME/.ssh/id_rsa" ]; then
+    echo ""
+    echo "To generate a new SSH key for GitHub:"
+    echo "  ssh-keygen -t ed25519 -C \"your_email@example.com\""
+    echo ""
+    echo "Then add it to your GitHub account:"
+    echo "  1. Copy the public key: cat ~/.ssh/id_ed25519.pub"
+    echo "  2. Go to GitHub Settings > SSH and GPG keys"
+    echo "  3. Click 'New SSH key' and paste the key"
+    echo ""
+fi
+
+# その他のGitホスティングサービスのknown_hostsを追加する場合はここに記述
+# 例：GitLab, Bitbucketなど

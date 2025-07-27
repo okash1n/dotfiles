@@ -3,16 +3,16 @@ set -e
 
 # このスクリプトはBrewfileやglobal-packages.jsonが変更されたときに
 # パッケージを更新するためのスクリプトです
-# hash: {{ include "dot_Brewfile" | sha256sum }}
+# hash: {{ include "dot_Brewfile.tmpl" | sha256sum }}
 # hash: {{ include "dot_config/npm/global-packages.json" | sha256sum }}
 
-# 初回実行時はスキップ（init.shで既に実行済みのため）
-if [ ! -f "$HOME/.config/chezmoi/.chezmoi_initialized" ]; then
-    echo "Skipping package updates (handled by init.sh)..."
+# 初回実行時はスキップ（run_onceスクリプトで既に実行済みのため）
+if [ -f "$HOME/.config/chezmoi/.chezmoi_initializing" ]; then
+    echo "Skipping package updates (handled by run_once scripts)..."
     exit 0
 fi
 
-echo "=== Updating system packages ==="
+echo "=== Updating system packages (configuration changed) ==="
 
 # Homebrewのパスを設定
 if [ -f "/opt/homebrew/bin/brew" ]; then
@@ -54,14 +54,22 @@ fi
 
 # Aquaパッケージの更新
 if command -v aqua &> /dev/null; then
+    # AQUA_CONFIGが設定されていない場合、一時的に設定
+    if [ -z "$AQUA_CONFIG" ]; then
+        export AQUA_CONFIG="$HOME/.config/aqua/aqua.yaml"
+    fi
+    
     # aqua.yamlが存在する場合のみ実行
-    if [ -f "$HOME/.config/aqua/aqua.yaml" ] || [ -f "$AQUA_CONFIG" ]; then
+    if [ -f "$AQUA_CONFIG" ]; then
         echo ""
         echo "Updating Aqua packages..."
-        aqua update
+        aqua update || {
+            echo "⚠️  Aqua update failed. This is not critical."
+        }
     else
         echo ""
-        echo "⚠️  Aqua is installed but no configuration file found. Skipping aqua update."
+        echo "⚠️  Aqua configuration not found at: $AQUA_CONFIG"
+        echo "    Skipping aqua update."
     fi
 fi
 

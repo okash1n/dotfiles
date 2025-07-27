@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+set -e
+
+# Rosettaのインストール（macOS ARM64のみ）
+
+{{ if and (eq .chezmoi.os "darwin") (eq .chezmoi.arch "arm64") -}}
+echo "=== Installing Rosetta (Apple Silicon) ==="
+
+# Rosettaがインストールされているか確認
+if ! /usr/bin/pgrep oahd &>/dev/null; then
+    echo "Installing Rosetta..."
+    /usr/sbin/softwareupdate --install-rosetta --agree-to-license
+    echo "✓ Rosetta installed"
+else
+    echo "✓ Rosetta is already installed"
+fi
+{{- else }}
+echo "Skipping Rosetta installation (not on Apple Silicon Mac)"
+{{- end }}

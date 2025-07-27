@@ -36,6 +36,7 @@ brew "xdg-ninja"
 brew "zsh"
 # Terraform
 brew "hashicorp/tap/terraform"
+{{ if eq .chezmoi.os "darwin" -}}
 # Plain-text editor for web pages, program source codes and more
 cask "coteditor"
 # Virtual monitor for screen sharing
@@ -47,10 +48,12 @@ cask "ghostty"
 cask "slack-cli"
 # Open-source code editor
 cask "visual-studio-code"
-vscode "alefragnani.project-manager"
-vscode "anthropic.claude-code"
-vscode "github.copilot"
-vscode "github.copilot-chat"
-vscode "hancel.markdown-image"
-vscode "marp-team.marp-vscode"
-vscode "yzhang.markdown-all-in-one"
+{{- end }}
+# VSCode extensions are installed separately to avoid brew bundle errors
+# vscode "alefragnani.project-manager"
+# vscode "anthropic.claude-code"
+# vscode "github.copilot"
+# vscode "github.copilot-chat"
+# vscode "hancel.markdown-image"
+# vscode "marp-team.marp-vscode"
+# vscode "yzhang.markdown-all-in-one"

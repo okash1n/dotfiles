@@ -6,17 +6,30 @@ function ensure_zcompiled {
   local compiled="$1.zwc"
   if [[ ! -r "$compiled" || "$1" -nt "$compiled" ]]; then
     echo "Compiling $1"
-    zcompile $1
+    # Ensure the directory exists before compiling
+    local dir=$(dirname "$compiled")
+    if [[ -w "$dir" ]]; then
+      zcompile $1
+    else
+      # Skip compilation if directory is not writable
+      return 0
+    fi
   fi
 }
 ensure_zcompiled ${ZDOTDIR:-$HOME}/.zshrc
 
-CACHE_DIR=${XDG_CACHE_HOME:-$HOME/.cache}
+# Set default XDG directories if not set
+export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
+export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
+export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
+export XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
+
+CACHE_DIR="$XDG_CACHE_HOME"
 SHELDON_CACHE="$CACHE_DIR/sheldon.zsh"
 SHELDON_TOML="$HOME/.config/sheldon/plugins.toml"
 if [[ ! -r "$SHELDON_CACHE" || "$SHELDON_TOML" -nt "$SHELDON_CACHE" ]]; then
-  mkdir -p $CACHE_DIR
-  sheldon source > $SHELDON_CACHE
+  mkdir -p "$CACHE_DIR"
+  sheldon source > "$SHELDON_CACHE"
 fi
 source "$SHELDON_CACHE"
 unset CACHE_DIR SHELDON_CACHE SHELDON_TOML
@@ -27,7 +40,8 @@ zsh-defer unfunction source
 zstyle ':completion:*' cache-path "$XDG_CACHE_HOME/zsh/zcompcache"
 
 # Ensure directories exist
-mkdir -p "$XDG_CACHE_HOME/zsh" "$XDG_STATE_HOME/zsh"
+[[ -n "$XDG_CACHE_HOME" ]] && mkdir -p "$XDG_CACHE_HOME/zsh" 2>/dev/null
+[[ -n "$XDG_STATE_HOME" ]] && mkdir -p "$XDG_STATE_HOME/zsh" 2>/dev/null
 
 # History configuration
 export HISTFILE="$XDG_STATE_HOME/zsh/history"

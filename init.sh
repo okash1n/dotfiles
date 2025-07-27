@@ -1,22 +1,17 @@
 #!/usr/bin/env bash
 set -e
 
-# エラーが発生した場合のトラップを設定
-trap 'echo "Error occurred at line $LINENO, exit code: $?"; exit 0' ERR
-
-# このスクリプトは新しいマシンでdotfilesをセットアップするための初期化スクリプトです
-# 前提条件：
-# 1. GitHubにSSHキーが登録済み
-# 2. このリポジトリが ~/dotfiles にクローン済み
+# 最小限のdotfiles初期化スクリプト (v0.9.1)
+# このスクリプトはHomebrewとchezmoiのインストール、dotfilesの適用のみを行います
+# その他の設定はchezmoiのrun_onceスクリプトで実行されます
 
 SCRIPT_DIR=$(cd $(dirname $0); pwd)
 
-echo "=== Dotfiles Setup Script ==="
+echo "=== Minimal Dotfiles Setup Script (v0.9.1) ==="
 echo "This script will:"
-echo "1. Install Rosetta (if on Apple Silicon)"
-echo "2. Install Homebrew"
-echo "3. Install packages from Brewfile (including chezmoi)"
-echo "4. Apply dotfiles with chezmoi"
+echo "1. Install Homebrew (if not installed)"
+echo "2. Install chezmoi"
+echo "3. Apply dotfiles with chezmoi"
 echo ""
 
 # SSHキーの存在確認
@@ -36,11 +31,31 @@ fi
 
 # sudo認証を最初に要求（必要な場合）
 NEEDS_SUDO=false
-if [ ! -f "/etc/zshenv" ] || ! grep -q "ZDOTDIR=" "/etc/zshenv"; then
-    NEEDS_SUDO=true
-fi
+
+# Homebrewがインストールされていない場合
 if ! command -v brew &> /dev/null; then
     NEEDS_SUDO=true
+fi
+
+# システムのzshenvパスを事前にチェック（man zshを使う前の簡易チェック）
+SYSTEM_ZSHENV_CHECK=""
+if [ "$(uname)" == "Darwin" ]; then
+    SYSTEM_ZSHENV_CHECK="/etc/zshenv"
+elif [ "$(uname)" == "Linux" ]; then
+    if [ -d "/etc/zsh" ]; then
+        SYSTEM_ZSHENV_CHECK="/etc/zsh/zshenv"
+    else
+        SYSTEM_ZSHENV_CHECK="/etc/zshenv"
+    fi
+fi
+
+# システムのzshenvに書き込む必要があり、権限がない場合
+if [ -n "$SYSTEM_ZSHENV_CHECK" ]; then
+    if [ ! -f "$SYSTEM_ZSHENV_CHECK" ] || ! grep -q "ZDOTDIR=" "$SYSTEM_ZSHENV_CHECK" 2>/dev/null; then
+        if [ ! -w "$SYSTEM_ZSHENV_CHECK" ] && [ ! -w "$(dirname "$SYSTEM_ZSHENV_CHECK")" ]; then
+            NEEDS_SUDO=true
+        fi
+    fi
 fi
 
 if [ "$NEEDS_SUDO" = true ]; then
@@ -57,22 +72,62 @@ if [ "$NEEDS_SUDO" = true ]; then
 fi
 
 # /etc/zshenvにZDOTDIRを設定（早い段階で実行）
-if [ "$NEEDS_SUDO" = true ] && ([ ! -f "/etc/zshenv" ] || ! grep -q "ZDOTDIR=" "/etc/zshenv"); then
-    echo ""
-    echo "=== Setting up ZDOTDIR in /etc/zshenv ==="
-    echo 'export ZDOTDIR="$HOME/.config/zsh"' | sudo tee -a /etc/zshenv > /dev/null
-    echo "✓ ZDOTDIR configured in /etc/zshenv"
+# システムのzshenv設定ファイルのパスを確認
+SYSTEM_ZSHENV=""
+
+# man zshからシステムのzshenvパスを取得（macOS/Linux共通）
+if command -v zsh &> /dev/null && command -v man &> /dev/null; then
+    # man zshの出力から/etc/zshenvまたは/etc/zsh/zshenvのパスを探す
+    ZSHENV_PATH=$(man zsh 2>/dev/null | grep -E '^\s*/etc/(zsh/)?zshenv' | head -1 | awk '{print $1}' || true)
+    if [ -n "$ZSHENV_PATH" ]; then
+        SYSTEM_ZSHENV="$ZSHENV_PATH"
+    fi
 fi
 
-# Rosettaのインストール (Apple Siliconの場合)
-if [[ "$(uname)" == "Darwin" && "$(uname -m)" == "arm64" ]]; then
-    echo "=== Installing Rosetta ==="
-    if ! /usr/bin/pgrep oahd &>/dev/null; then
-        echo "Installing Rosetta..."
-        /usr/sbin/softwareupdate --install-rosetta --agree-to-license
-        echo "✓ Rosetta installed"
+# man zshで見つからない場合はOS別のデフォルトパスを使用
+if [ -z "$SYSTEM_ZSHENV" ]; then
+    if [ "$(uname)" == "Darwin" ]; then
+        SYSTEM_ZSHENV="/etc/zshenv"
+    elif [ "$(uname)" == "Linux" ]; then
+        if [ -d "/etc/zsh" ]; then
+            SYSTEM_ZSHENV="/etc/zsh/zshenv"
+        else
+            SYSTEM_ZSHENV="/etc/zshenv"
+        fi
+    fi
+fi
+
+# システムのzshenvファイルにZDOTDIRを設定
+if [ -n "$SYSTEM_ZSHENV" ]; then
+    if [ -f "$SYSTEM_ZSHENV" ] || [ -w "$(dirname "$SYSTEM_ZSHENV")" ]; then
+        if ! grep -q "ZDOTDIR=" "$SYSTEM_ZSHENV" 2>/dev/null; then
+            # sudoが必要かチェック
+            if [ ! -w "$SYSTEM_ZSHENV" ] && [ ! -w "$(dirname "$SYSTEM_ZSHENV")" ]; then
+                echo ""
+                echo "=== Setting up ZDOTDIR in $SYSTEM_ZSHENV ==="
+                echo "This requires administrator privileges."
+                echo 'export ZDOTDIR="$HOME/.config/zsh"' | sudo tee -a "$SYSTEM_ZSHENV" > /dev/null
+                echo "✓ ZDOTDIR configured in $SYSTEM_ZSHENV"
+            else
+                echo ""
+                echo "=== Setting up ZDOTDIR in $SYSTEM_ZSHENV ==="
+                echo 'export ZDOTDIR="$HOME/.config/zsh"' >> "$SYSTEM_ZSHENV"
+                echo "✓ ZDOTDIR configured in $SYSTEM_ZSHENV"
+            fi
+        else
+            echo "✓ ZDOTDIR already configured in $SYSTEM_ZSHENV"
+        fi
     else
-        echo "✓ Rosetta is already installed"
+        # システムファイルに書き込めない場合は~/.zshenvを使用
+        if [ ! -f "$HOME/.zshenv" ] || ! grep -q "ZDOTDIR=" "$HOME/.zshenv"; then
+            echo ""
+            echo "=== Setting up ZDOTDIR in ~/.zshenv ==="
+            echo "Note: Could not write to $SYSTEM_ZSHENV, using ~/.zshenv instead"
+            echo 'export ZDOTDIR="$HOME/.config/zsh"' >> "$HOME/.zshenv"
+            echo "✓ ZDOTDIR configured in ~/.zshenv"
+        else
+            echo "✓ ZDOTDIR already configured in ~/.zshenv"
+        fi
     fi
 fi
 
@@ -88,8 +143,11 @@ setup_homebrew_path() {
         fi
     elif [ "$(uname)" == "Linux" ]; then
         # Linux
-        test -d ~/.linuxbrew && eval $(~/.linuxbrew/bin/brew shellenv)
-        test -d /home/linuxbrew/.linuxbrew && eval $(/home/linuxbrew/.linuxbrew/bin/brew shellenv)
+        if [ -f "/home/linuxbrew/.linuxbrew/bin/brew" ]; then
+            eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+        elif [ -f "$HOME/.linuxbrew/bin/brew" ]; then
+            eval "$($HOME/.linuxbrew/bin/brew shellenv)"
+        fi
     fi
 }
 
@@ -100,6 +158,16 @@ setup_homebrew_path
 if ! command -v brew &> /dev/null; then
     echo ""
     echo "=== Installing Homebrew ==="
+    
+    # OS別の注意事項を表示
+    if [ "$(uname)" == "Darwin" ]; then
+        echo "Note: Homebrew requires Xcode Command Line Tools."
+        echo "If prompted, please install them and run this script again."
+    elif [ "$(uname)" == "Linux" ]; then
+        echo "Note: Homebrew on Linux may require additional dependencies."
+        echo "The installer will attempt to install them automatically."
+    fi
+    
     # NONINTERACTIVE=1でプロンプトをスキップ
     NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
     
@@ -117,101 +185,47 @@ else
     echo "✓ Homebrew is already installed"
 fi
 
-# Brewfileからパッケージをインストール
+# chezmoiのインストール
 echo ""
-echo "=== Installing packages from Brewfile ==="
-# リポジトリ内のBrewfileを使用
-if [ -f "$SCRIPT_DIR/dot_Brewfile" ]; then
-    brew bundle --file="$SCRIPT_DIR/dot_Brewfile"
-    echo "✓ All packages installed"
-else
-    echo "❌ Error: Brewfile not found at $SCRIPT_DIR/dot_Brewfile"
-    exit 1
-fi
-
-# chezmoiが正しくインストールされたか確認
+echo "=== Installing chezmoi ==="
 if ! command -v chezmoi &> /dev/null; then
-    echo "❌ Error: chezmoi was not installed properly"
-    exit 1
+    brew install chezmoi
+    echo "✓ chezmoi installed"
+else
+    echo "✓ chezmoi is already installed"
 fi
 
 # chezmoiでdotfilesを適用
 echo ""
 echo "=== Applying dotfiles with chezmoi ==="
 
-# chezmoi用の設定ファイルを一時的に作成（固定値を使用）
+# chezmoi用の設定ファイルを一時的に作成
 CHEZMOI_CONFIG_DIR="$HOME/.config/chezmoi"
 mkdir -p "$CHEZMOI_CONFIG_DIR"
 
+# 基本的な設定のみ（詳細な設定はchezmoiの対話的プロンプトで入力）
 cat > "$CHEZMOI_CONFIG_DIR/chezmoi.yaml" <<EOF
+# This is a minimal config file
+# Additional configuration will be prompted during chezmoi init
 data:
   name: "okash1n"
   email: "48118431+okash1n@users.noreply.github.com"
 EOF
 
+# 初期化フラグを作成（run_onchangeスクリプトの初回実行をスキップするため）
+touch "$CHEZMOI_CONFIG_DIR/.chezmoi_initializing"
+
+# chezmoiの初期化と適用
+echo "Initializing and applying dotfiles..."
 chezmoi init --source "$SCRIPT_DIR" --apply
-echo "✓ Dotfiles applied"
-
-# chezmoi初期化完了フラグを作成
-mkdir -p "$HOME/.config/chezmoi"
-touch "$HOME/.config/chezmoi/.chezmoi_initialized"
-
-# NPMグローバルパッケージのインストール
-echo ""
-echo "=== Installing NPM global packages ==="
-if [ -f "$HOME/.config/npm/global-packages.json" ]; then
-    if command -v npm &> /dev/null; then
-        # jqがインストールされているか確認
-        if command -v jq &> /dev/null; then
-            # global-packages.jsonからパッケージ名を抽出してインストール
-            packages=$(jq -r '.dependencies | to_entries | map(.key + "@" + .value) | join(" ")' "$HOME/.config/npm/global-packages.json")
-            if [ ! -z "$packages" ]; then
-                echo "Installing packages: $packages"
-                npm install -g $packages
-                echo "✓ NPM global packages installed"
-            else
-                echo "No packages found in global-packages.json"
-            fi
-        else
-            echo "⚠️  jq not found. Skipping NPM package installation."
-        fi
-    else
-        echo "⚠️  npm not found. Skipping NPM package installation."
-    fi
-else
-    echo "⚠️  global-packages.json not found. Skipping NPM package installation."
-fi
-
-# プライベートアセットのインストール（VSCode拡張機能など）
-echo ""
-echo "=== Installing private assets ==="
-if [ -d "$HOME/ghq/github.com/okash1n/dracula-pro" ]; then
-    echo "Found dracula-pro repository"
-    if [ -f "$HOME/ghq/github.com/okash1n/dracula-pro/themes/visual-studio-code/dracula-pro.vsix" ]; then
-        echo "Installing Dracula Pro theme..."
-        code --install-extension "$HOME/ghq/github.com/okash1n/dracula-pro/themes/visual-studio-code/dracula-pro.vsix"
-        echo "✓ Dracula Pro theme installed"
-    fi
-else
-    # ghqでクローン（SSHを明示的に使用）
-    if command -v ghq &> /dev/null; then
-        echo "Cloning dracula-pro repository..."
-        ghq get git@github.com:okash1n/dracula-pro.git
-        if [ -f "$HOME/ghq/github.com/okash1n/dracula-pro/themes/visual-studio-code/dracula-pro.vsix" ]; then
-            echo "Installing Dracula Pro theme..."
-            code --install-extension "$HOME/ghq/github.com/okash1n/dracula-pro/themes/visual-studio-code/dracula-pro.vsix"
-            echo "✓ Dracula Pro theme installed"
-        fi
-    else
-        echo "⚠️  ghq or gh not available. Skipping private assets installation."
-        echo "   To install manually: ghq get okash1n/dracula-pro"
-    fi
-fi
 
 echo ""
 echo "=== Setup Complete! ==="
 echo ""
-echo "🎉 Your dotfiles have been successfully set up!"
+echo "🎉 Basic dotfiles setup is complete!"
+echo ""
+echo "Additional setup tasks will be executed by chezmoi's run_once scripts."
+echo "You may need to restart your shell or re-login for all changes to take effect."
 echo ""
 echo "To manage your dotfiles going forward:"
 echo "  chezmoi diff       # See what changes chezmoi will make"
@@ -226,6 +240,9 @@ echo "To add zsh to /etc/shells and set it as your default shell, run the follow
 echo 'echo "$(which zsh)" | sudo tee -a /etc/shells'
 echo 'chsh -s "$(which zsh)"'
 
+# 初期化フラグを削除（通常運用でrun_onchangeが動作するように）
+rm -f "$CHEZMOI_CONFIG_DIR/.chezmoi_initializing" 2>/dev/null || true
+
 # sudoのバックグラウンドプロセスをクリーンアップ
 if [ ! -z "$SUDO_PID" ]; then
     kill $SUDO_PID 2>/dev/null || true
@@ -236,7 +253,12 @@ if [ "$1" != "--no-exec" ]; then
     # 直接実行された場合のみzshを起動
     if [ -z "$MAKE" ] && [ -z "$MAKELEVEL" ]; then
         # zshを再実行することで、.zprofileなどを読み込ませる
-        exec zsh -l
+        if command -v zsh &> /dev/null; then
+            exec zsh -l
+        else
+            echo ""
+            echo "⚠️  zsh is not installed. Please install it manually and re-run the shell."
+        fi
     fi
 fi
 

@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+set -e
+
+# 最終設定
+
+echo "=== Finalizing setup ==="
+
+# 初期化フラグは既にinit.shで管理されているため、ここでは作成しない
+
+echo "✓ Dotfiles setup completed"
+echo ""
+echo "🎉 All setup tasks have been completed!"
+echo ""
+echo "To manage your dotfiles going forward:"
+echo "  chezmoi diff       # See what changes chezmoi will make"
+echo "  chezmoi apply      # Apply the changes"
+echo "  chezmoi update     # Pull latest changes and apply"
+echo "  chezmoi cd         # Go to chezmoi source directory"
+echo "  chezmoi add <file> # Add a new file to chezmoi"
+echo ""
+echo "You may need to restart your shell or re-login for all changes to take effect."
