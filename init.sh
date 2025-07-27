@@ -221,9 +221,5 @@ if [ "$1" != "--no-exec" ]; then
     if [ -z "$MAKE" ] && [ -z "$MAKELEVEL" ]; then
         # zshを再実行することで、.zprofileなどを読み込ませる
         exec zsh -l
-    else
-        echo ""
-        echo "To start using your new shell configuration, run:"
-        echo "  exec zsh -l"
     fi
 fi
