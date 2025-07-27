@@ -100,13 +100,27 @@ echo "=== Applying dotfiles with chezmoi ==="
 GIT_NAME=$(git config --global user.name 2>/dev/null || echo "")
 GIT_EMAIL=$(git config --global user.email 2>/dev/null || echo "")
 
+# chezmoi用の設定ファイルを一時的に作成
+CHEZMOI_CONFIG_DIR="$HOME/.config/chezmoi"
+mkdir -p "$CHEZMOI_CONFIG_DIR"
+
 if [ -z "$GIT_NAME" ] || [ -z "$GIT_EMAIL" ]; then
     echo "Git user information not found. Setting up chezmoi with defaults..."
-    chezmoi init --source "$SCRIPT_DIR" --apply --prompt-string name="User" --prompt-string email="user@example.com"
+    cat > "$CHEZMOI_CONFIG_DIR/chezmoi.yaml" <<EOF
+data:
+  name: "User"
+  email: "user@example.com"
+EOF
 else
     echo "Using Git configuration: $GIT_NAME <$GIT_EMAIL>"
-    chezmoi init --source "$SCRIPT_DIR" --apply --prompt-string name="$GIT_NAME" --prompt-string email="$GIT_EMAIL"
+    cat > "$CHEZMOI_CONFIG_DIR/chezmoi.yaml" <<EOF
+data:
+  name: "$GIT_NAME"
+  email: "$GIT_EMAIL"
+EOF
 fi
+
+chezmoi init --source "$SCRIPT_DIR" --apply
 echo "✓ Dotfiles applied"
 
 # プライベートアセットのインストール（VSCode拡張機能など）
