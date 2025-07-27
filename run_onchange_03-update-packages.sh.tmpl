@@ -43,9 +43,15 @@ fi
 
 # Aquaパッケージの更新
 if command -v aqua &> /dev/null; then
-    echo ""
-    echo "Updating Aqua packages..."
-    aqua update
+    # aqua.yamlが存在する場合のみ実行
+    if [ -f "$HOME/.config/aqua/aqua.yaml" ] || [ -f "$AQUA_CONFIG" ]; then
+        echo ""
+        echo "Updating Aqua packages..."
+        aqua update
+    else
+        echo ""
+        echo "⚠️  Aqua is installed but no configuration file found. Skipping aqua update."
+    fi
 fi
 
 echo ""
