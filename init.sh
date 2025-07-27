@@ -156,6 +156,32 @@ echo "✓ Dotfiles applied"
 mkdir -p "$HOME/.config/chezmoi"
 touch "$HOME/.config/chezmoi/.chezmoi_initialized"
 
+# NPMグローバルパッケージのインストール
+echo ""
+echo "=== Installing NPM global packages ==="
+if [ -f "$HOME/.config/npm/global-packages.json" ]; then
+    if command -v npm &> /dev/null; then
+        # jqがインストールされているか確認
+        if command -v jq &> /dev/null; then
+            # global-packages.jsonからパッケージ名を抽出してインストール
+            packages=$(jq -r '.dependencies | to_entries | map(.key + "@" + .value) | join(" ")' "$HOME/.config/npm/global-packages.json")
+            if [ ! -z "$packages" ]; then
+                echo "Installing packages: $packages"
+                npm install -g $packages
+                echo "✓ NPM global packages installed"
+            else
+                echo "No packages found in global-packages.json"
+            fi
+        else
+            echo "⚠️  jq not found. Skipping NPM package installation."
+        fi
+    else
+        echo "⚠️  npm not found. Skipping NPM package installation."
+    fi
+else
+    echo "⚠️  global-packages.json not found. Skipping NPM package installation."
+fi
+
 # プライベートアセットのインストール（VSCode拡張機能など）
 echo ""
 echo "=== Installing private assets ==="

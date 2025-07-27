@@ -1,4 +1,4 @@
-# Files to ignore
+# Repository files
 README.md
 CHANGELOG.md
 Makefile
@@ -7,21 +7,25 @@ LICENSE
 .gitignore
 init.sh
 update.sh
-npm/
-configs/raycast/extensions/*/node_modules/
-configs/raycast/extensions/node_modules
+
+# Node modules
 **/node_modules/
-**/node_modules
-configs/npm/*.202*
-configs/karabiner/automatic_backups/
-configs/zsh/*.zwc
-configs/zsh/.zsh_history
-configs/claude/ide/*.lock
-configs/claude/shell-snapshots/
-configs/claude/statsig/
-configs/claude/todos/
-configs/claude/projects/
-configs/claude/.claude.json
-configs/claude/.claude.json.backup
-configs/chezmoi/.chezmoi_initialized
-configs/chezmoi/chezmoistate.boltdb
+
+# Backup files
+dot_config/npm/*.202*
+dot_config/karabiner/automatic_backups/
+
+# Compiled/cache files
+dot_config/zsh/*.zwc
+
+# Runtime/state files
+dot_config/zsh/dot_zsh_history
+dot_config/claude/ide/*.lock
+dot_config/claude/shell-snapshots/
+dot_config/claude/statsig/
+dot_config/claude/todos/
+dot_config/claude/projects/
+dot_config/claude/dot_claude.json
+dot_config/claude/dot_claude.json.backup
+dot_config/chezmoi/.chezmoi_initialized
+dot_config/chezmoi/chezmoistate.boltdb
