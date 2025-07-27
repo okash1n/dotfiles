@@ -31,5 +31,7 @@ fi
 # Aquaがインストールされている場合はaquaのパッケージもインストール
 if command -v aqua &> /dev/null && [ -f "$HOME/.config/aqua/aqua.yaml" ]; then
     echo "Installing aqua packages..."
-    aqua i -a
+    aqua i -a || {
+        echo "⚠️  Aqua package installation failed. This is not critical."
+    }
 fi

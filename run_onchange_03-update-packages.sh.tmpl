@@ -52,7 +52,9 @@ if command -v aqua &> /dev/null; then
     if [ -f "$HOME/.config/aqua/aqua.yaml" ] || [ -f "$AQUA_CONFIG" ]; then
         echo ""
         echo "Updating Aqua packages..."
-        aqua update
+        aqua update || {
+            echo "⚠️  Aqua update failed. This is not critical."
+        }
     else
         echo ""
         echo "⚠️  Aqua is installed but no configuration file found. Skipping aqua update."
