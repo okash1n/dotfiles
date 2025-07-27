@@ -93,6 +93,14 @@ if ! command -v chezmoi &> /dev/null; then
     exit 1
 fi
 
+# /etc/zshenvにZDOTDIRを設定（まだ設定されていない場合）
+if [ ! -f "/etc/zshenv" ] || ! grep -q "ZDOTDIR=" "/etc/zshenv"; then
+    echo ""
+    echo "=== Setting up ZDOTDIR in /etc/zshenv ==="
+    echo 'export ZDOTDIR="$HOME/.config/zsh"' | sudo tee -a /etc/zshenv > /dev/null
+    echo "✓ ZDOTDIR configured in /etc/zshenv"
+fi
+
 # chezmoiでdotfilesを適用
 echo ""
 echo "=== Applying dotfiles with chezmoi ==="
