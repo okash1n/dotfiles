@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Terminal.appにDracula Proテーマを自動適用
   - Hack Nerd Fontをデフォルトフォントに設定
   - Ghosttyには既に設定済み
+  - ローカル環境でセットアップ後にGhosttyを自動起動
 
 ### Changed
 - すべてのスクリプトでLinux用Homebrewパスを追加
