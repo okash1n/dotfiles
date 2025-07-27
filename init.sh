@@ -14,6 +14,50 @@ echo "2. Install chezmoi"
 echo "3. Apply dotfiles with chezmoi"
 echo ""
 
+# sudo認証を最初に要求（必要な場合）
+NEEDS_SUDO=false
+
+# macOSでHomebrewのインストールまたは/etc/zshenvの設定が必要な場合
+if [ "$(uname)" == "Darwin" ]; then
+    if [ ! -f "/etc/zshenv" ] || ! grep -q "ZDOTDIR=" "/etc/zshenv" ]; then
+        NEEDS_SUDO=true
+    fi
+    if ! command -v brew &> /dev/null; then
+        NEEDS_SUDO=true
+    fi
+fi
+
+if [ "$NEEDS_SUDO" = true ]; then
+    echo "This script requires administrator privileges for initial setup."
+    echo "Please enter your password when prompted."
+    sudo -v
+    
+    # sudoのタイムスタンプを定期的に更新（バックグラウンドで）
+    while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
+    SUDO_PID=$!
+    
+    # 少し待機してsudoが確実に有効になるまで待つ
+    sleep 1
+fi
+
+# /etc/zshenvにZDOTDIRを設定（macOSの場合のみ、早い段階で実行）
+if [ "$(uname)" == "Darwin" ]; then
+    if [ "$NEEDS_SUDO" = true ] && ([ ! -f "/etc/zshenv" ] || ! grep -q "ZDOTDIR=" "/etc/zshenv"); then
+        echo ""
+        echo "=== Setting up ZDOTDIR in /etc/zshenv ==="
+        echo 'export ZDOTDIR="$HOME/.config/zsh"' | sudo tee -a /etc/zshenv > /dev/null
+        echo "✓ ZDOTDIR configured in /etc/zshenv"
+    fi
+elif [ "$(uname)" == "Linux" ]; then
+    # Linuxの場合は~/.zshenvを使用
+    if [ ! -f "$HOME/.zshenv" ] || ! grep -q "ZDOTDIR=" "$HOME/.zshenv"; then
+        echo ""
+        echo "=== Setting up ZDOTDIR in ~/.zshenv ==="
+        echo 'export ZDOTDIR="$HOME/.config/zsh"' >> "$HOME/.zshenv"
+        echo "✓ ZDOTDIR configured in ~/.zshenv"
+    fi
+fi
+
 # Homebrewのパスを設定（既にインストールされている場合のため）
 setup_homebrew_path() {
     if [ "$(uname)" == "Darwin" ]; then
@@ -108,3 +152,8 @@ echo "  chezmoi update     # Pull latest changes and apply"
 echo "  chezmoi cd         # Go to chezmoi source directory"
 echo "  chezmoi add <file> # Add a new file to chezmoi"
 echo ""
+
+# sudoのバックグラウンドプロセスをクリーンアップ
+if [ ! -z "$SUDO_PID" ]; then
+    kill $SUDO_PID 2>/dev/null || true
+fi
