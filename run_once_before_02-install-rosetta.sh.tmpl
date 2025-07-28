@@ -9,10 +9,20 @@ echo "=== Installing Rosetta (Apple Silicon) ==="
 # Rosettaがインストールされているか確認
 if ! /usr/bin/pgrep oahd &>/dev/null; then
     echo "Installing Rosetta..."
-    /usr/sbin/softwareupdate --install-rosetta --agree-to-license
-    echo "✓ Rosetta installed"
+    /usr/sbin/softwareupdate --install-rosetta --agree-to-license || {
+        # エラーコードを確認
+        exit_code=$?
+        if [ $exit_code -eq 1 ]; then
+            # "Rosetta 2 update is not available" の場合、既にインストール済み
+            echo "✓ Rosetta is already installed (no update available)"
+        else
+            echo "⚠️  Failed to install Rosetta (exit code: $exit_code)"
+            exit $exit_code
+        fi
+    }
+    echo "✓ Rosetta installation completed"
 else
-    echo "✓ Rosetta is already installed"
+    echo "✓ Rosetta is already installed and running"
 fi
 {{- else }}
 echo "Skipping Rosetta installation (not on Apple Silicon Mac)"
