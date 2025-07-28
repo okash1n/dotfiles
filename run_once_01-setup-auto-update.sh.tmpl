@@ -6,16 +6,78 @@ set -e
 
 echo "=== Setting up automatic updates ==="
 
+{{ if eq .chezmoi.os "darwin" -}}
+# macOSではlaunchdを使用（cronはセキュリティ制限があるため）
+echo "Setting up automatic updates using launchd..."
+
+# launchdの設定ファイルを作成
+PLIST_PATH="$HOME/Library/LaunchAgents/com.chezmoi.update.plist"
+
+# LaunchAgentsディレクトリが存在しない場合は作成
+mkdir -p "$HOME/Library/LaunchAgents"
+
+# 既存の設定があれば削除
+if [ -f "$PLIST_PATH" ]; then
+    launchctl unload "$PLIST_PATH" 2>/dev/null || true
+fi
+
+# 新しい設定を作成
+cat > "$PLIST_PATH" <<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.chezmoi.update</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>{{ lookPath "chezmoi" }}</string>
+        <string>update</string>
+        <string>--apply</string>
+    </array>
+    <key>StartCalendarInterval</key>
+    <array>
+        <!-- 毎日12:00に実行 -->
+        <dict>
+            <key>Hour</key>
+            <integer>12</integer>
+            <key>Minute</key>
+            <integer>0</integer>
+        </dict>
+    </array>
+    <key>StandardOutPath</key>
+    <string>/tmp/chezmoi-update.log</string>
+    <key>StandardErrorPath</key>
+    <string>/tmp/chezmoi-update.log</string>
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+        <key>HOME</key>
+        <string>{{ .chezmoi.homeDir }}</string>
+    </dict>
+</dict>
+</plist>
+EOF
+
+# 設定を読み込む
+launchctl load "$PLIST_PATH"
+
+echo "✓ Automatic daily updates configured using launchd"
+echo "  Updates will run daily at 12:00 PM"
+echo "  Logs: /tmp/chezmoi-update.log"
+echo ""
+echo "To disable automatic updates:"
+echo "  launchctl unload ~/Library/LaunchAgents/com.chezmoi.update.plist"
+echo "  rm ~/Library/LaunchAgents/com.chezmoi.update.plist"
+
+{{- else if eq .chezmoi.os "linux" -}}
+# Linux環境ではcronを使用
+echo "Setting up automatic updates using cron..."
+
 # cronがインストールされているか確認
 if ! command -v crontab &> /dev/null; then
     echo "⚠️  cron is not installed."
-    
-    {{ if eq .chezmoi.os "darwin" -}}
-    # macOSでcronが無効の場合の対処
-    echo "   On macOS, cron may be disabled. You can enable it or use launchd instead."
-    echo "   To use cron, grant full disk access to /usr/sbin/cron in System Settings."
-    {{- else if eq .chezmoi.os "linux" -}}
-    # Linuxでcronをインストール
     echo "   Installing cron..."
     if command -v apt-get &> /dev/null; then
         sudo apt-get update && sudo apt-get install -y cron
@@ -27,7 +89,6 @@ if ! command -v crontab &> /dev/null; then
         echo "   0 12 * * * $(which chezmoi) update --apply >> /tmp/chezmoi-update.log 2>&1"
         exit 0
     fi
-    {{- end }}
 fi
 
 # Homebrewのパスを検出
@@ -60,12 +121,4 @@ echo "  crontab -e # and remove the chezmoi update line"
 echo ""
 echo "To view current cron jobs:"
 echo "  crontab -l"
-
-{{ if eq .chezmoi.os "darwin" -}}
-# macOSで既存のlaunchd設定があれば削除（cron移行のため）
-if [ -f "$HOME/Library/LaunchAgents/com.chezmoi.update.plist" ]; then
-    echo "Removing old launchd configuration..."
-    launchctl unload "$HOME/Library/LaunchAgents/com.chezmoi.update.plist" 2>/dev/null || true
-    rm -f "$HOME/Library/LaunchAgents/com.chezmoi.update.plist"
-fi
 {{- end }}

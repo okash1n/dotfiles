@@ -270,7 +270,7 @@ echo "  chezmoi add <file> # Add a new file to chezmoi"
 echo ""
 
 # 追加手順の案内（実行環境に基づく）
-echo "=== Next steps ==="
+echo "=== Final setup steps ==="
 echo ""
 
 # Brewのパスを検出（グローバルに使用）
@@ -290,38 +290,24 @@ elif [ -f "$HOME/.linuxbrew/bin/brew" ]; then
     BREW_PREFIX="$HOME/.linuxbrew"
 fi
 
-# Homebrewのパス設定が必要かチェック
-if ! command -v brew &> /dev/null && [ -n "$BREW_PATH" ]; then
-    echo "1. Add Homebrew to your PATH:"
-    
-    # 現在のシェルを検出
-    CURRENT_SHELL=$(basename "$SHELL")
-    case "$CURRENT_SHELL" in
-        bash)
-            echo "   echo 'eval \"\$(${BREW_PATH} shellenv)\"' >> ~/.bashrc"
-            echo "   eval \"\$(${BREW_PATH} shellenv)\""
-            ;;
-        zsh)
-            echo "   echo 'eval \"\$(${BREW_PATH} shellenv)\"' >> ~/.zshrc"
-            echo "   eval \"\$(${BREW_PATH} shellenv)\""
-            ;;
-        *)
-            echo "   Add Homebrew to your shell's configuration file:"
-            echo "   eval \"\$(${BREW_PATH} shellenv)\""
-            ;;
-    esac
-    echo ""
-fi
-
 # zshがインストールされたが、現在のシェルがzshでない場合
 ZSH_PATH="$(PATH="$BREW_PREFIX/bin:$PATH" which zsh 2>/dev/null || true)"
 if [ -n "$ZSH_PATH" ] && [ "$SHELL" != "$ZSH_PATH" ]; then
-    echo "2. Set zsh as your default shell:"
-    echo "   echo \"$ZSH_PATH\" | sudo tee -a /etc/shells"
-    echo "   chsh -s \"$ZSH_PATH\""
+    echo "Setting zsh as your default shell..."
+    
+    # /etc/shellsにzshを追加
+    if ! grep -q "$ZSH_PATH" /etc/shells 2>/dev/null; then
+        echo "Adding $ZSH_PATH to /etc/shells..."
+        echo "$ZSH_PATH" | sudo tee -a /etc/shells > /dev/null
+        echo "✓ zsh added to /etc/shells"
+    fi
+    
+    # デフォルトシェルをzshに変更
+    echo "Changing default shell to zsh..."
+    sudo chsh -s "$ZSH_PATH" "$USER"
+    echo "✓ Default shell changed to zsh"
     echo ""
-    echo "3. Start a new zsh session:"
-    echo "   zsh"
+    echo "Note: You'll need to start a new terminal session for the shell change to take effect."
     echo ""
 fi
 
@@ -337,12 +323,16 @@ fi
 if [ "$1" != "--no-exec" ]; then
     # 直接実行された場合のみzshを起動
     if [ -z "$MAKE" ] && [ -z "$MAKELEVEL" ]; then
-        # zshを再実行することで、.zprofileなどを読み込ませる
-        if command -v zsh &> /dev/null; then
-            exec zsh -l
+        # zshのパスを再確認（Homebrewのパスを含む）
+        ZSH_FINAL_PATH="$(PATH="$BREW_PREFIX/bin:$PATH" which zsh 2>/dev/null || which zsh 2>/dev/null || true)"
+        
+        if [ -n "$ZSH_FINAL_PATH" ]; then
+            # デフォルトシェルがzshに変更されている場合は、exec zshで再起動
+            # そうでない場合は、明示的にzshを起動
+            exec "$ZSH_FINAL_PATH" -l
         else
             echo ""
-            echo "⚠️  zsh is not installed. Please install it manually and re-run the shell."
+            echo "⚠️  zsh is not installed. The installation may have failed."
         fi
     fi
 fi

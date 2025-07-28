@@ -12,9 +12,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - ARM64アーキテクチャ対応（Ubuntu ARM仮想マシンでテスト済み）
   - Homebrew on Linuxの適切なパス設定（`/home/linuxbrew`と`$HOME/.linuxbrew`）
   - Linux環境でのpowerlevel10kテーマパスの動的検出
-- 自動更新機能をcronで統一（macOS/Linux共通）
-  - macOSでもlaunchdからcronに移行
-  - cronの自動インストール（Linux: Ubuntu/RHEL系対応）
+- 自動更新機能の改善
+  - macOS: launchdを使用（セキュリティ制限を回避）
+  - Linux: cronを使用（自動インストール対応: Ubuntu/RHEL系）
   - 毎日12:00にchezmoi updateを実行
   - Homebrewパスを自動検出して設定
 - macOSターミナルの自動設定
@@ -36,6 +36,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Linux環境でのlaunchctlエラーを修正
   - `run_once_01-setup-auto-update.sh.tmpl`でmacOS専用コマンドをスキップ
   - launchdベースの自動更新をmacOSのみに限定
+- Linux環境での完全自動セットアップ実現
+  - デフォルトシェルのzshへの自動変更（`/etc/shells`への追加と`chsh`実行）
+  - GitHub CLI (gh)のビルド失敗時に公式バイナリを自動ダウンロード・インストール
+  - zshのパス検出を改善して確実に起動
 - 前提条件の自動確認・インストール
   - macOS: Xcode Command Line Toolsの自動確認（未インストールの場合はプロンプト表示）
   - Linux: build-essentialの自動インストール（Ubuntu/Debian、RHEL/CentOS対応）

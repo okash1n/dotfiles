@@ -37,10 +37,27 @@ if [ -f "$HOME/.Brewfile" ]; then
                     brew install --build-from-source $pkg 2>/dev/null || {
                         echo "⚠️  Failed to install $pkg. This package may not be critical."
                         
-                        # ghの場合は代替インストール方法を提案
-                        if [ "$pkg" = "gh" ]; then
-                            echo "   Alternative: You can install gh directly from https://github.com/cli/cli/releases"
-                            echo "   or use: curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg"
+                        # ghの場合は公式バイナリを自動インストール
+                        if [ "$pkg" = "gh" ] && [ "$(uname)" == "Linux" ]; then
+                            echo "   Installing gh from official GitHub release..."
+                            
+                            # 最新バージョンを取得
+                            GH_VERSION=$(curl -s https://api.github.com/repos/cli/cli/releases/latest | grep 'tag_name' | cut -d '"' -f 4 | tr -d 'v')
+                            
+                            if [ -n "$GH_VERSION" ]; then
+                                # ARM64 Linux用のバイナリをダウンロード
+                                curl -sSL "https://github.com/cli/cli/releases/download/v${GH_VERSION}/gh_${GH_VERSION}_linux_arm64.tar.gz" -o /tmp/gh.tar.gz
+                                
+                                # 解凍してインストール
+                                tar xzf /tmp/gh.tar.gz -C /tmp
+                                sudo cp "/tmp/gh_${GH_VERSION}_linux_arm64/bin/gh" "$BREW_PREFIX/bin/"
+                                sudo chmod +x "$BREW_PREFIX/bin/gh"
+                                rm -rf /tmp/gh.tar.gz "/tmp/gh_${GH_VERSION}_linux_arm64"
+                                
+                                echo "✓ gh successfully installed from official release"
+                            else
+                                echo "⚠️  Could not determine gh version. Please install manually."
+                            fi
                         fi
                     }
                 fi
