@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -e
+# NPMパッケージのインストールエラーで全体のセットアップを止めないようにset -eを使わない
 
 # NPMグローバルパッケージをインストール（初回のみ）
 
@@ -28,20 +28,42 @@ if ! command -v jq &> /dev/null; then
     exit 0
 fi
 
+# NPMのネットワーク設定を最適化（タイムアウト対策）
+echo "Configuring NPM for better network performance..."
+npm config set fetch-timeout 300000
+npm config set fetch-retry-mintimeout 20000
+npm config set fetch-retry-maxtimeout 120000
+npm config set fetch-retries 5
+
 # global-packages.jsonが存在する場合
 if [ -f "$HOME/.config/npm/global-packages.json" ]; then
     echo "Installing packages from global-packages.json..."
     
     # package.jsonから依存関係を読み取ってインストール
-    PACKAGES=$(jq -r '.dependencies | to_entries | .[] | "\(.key)@\(.value)"' "$HOME/.config/npm/global-packages.json" | tr '\n' ' ')
+    echo "Reading packages from global-packages.json..."
     
-    if [ -n "$PACKAGES" ]; then
-        echo "Installing: $PACKAGES"
-        npm install -g $PACKAGES
-        echo "✓ NPM global packages installed"
-    else
-        echo "No packages found in global-packages.json"
+    # パッケージを一つずつインストール（エラー時の影響を最小限に）
+    FAILED_PACKAGES=""
+    while IFS= read -r package; do
+        if [ -n "$package" ]; then
+            echo "Installing $package..."
+            if npm install -g "$package" 2>/dev/null; then
+                echo "✓ $package installed successfully"
+            else
+                echo "⚠️  Failed to install $package"
+                FAILED_PACKAGES="$FAILED_PACKAGES $package"
+            fi
+        fi
+    done < <(jq -r '.dependencies | to_entries | .[] | "\(.key)@\(.value)"' "$HOME/.config/npm/global-packages.json")
+    
+    if [ -n "$FAILED_PACKAGES" ]; then
+        echo ""
+        echo "⚠️  Some packages failed to install:$FAILED_PACKAGES"
+        echo "   You can try installing them manually later with: npm install -g <package-name>"
+        echo ""
     fi
+    
+    echo "✓ NPM global package installation completed"
 else
     echo "⚠️  global-packages.json not found at ~/.config/npm/global-packages.json"
 fi
