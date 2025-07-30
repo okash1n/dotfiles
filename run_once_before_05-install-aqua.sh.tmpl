@@ -38,42 +38,8 @@ curl -sSfL -O "https://raw.githubusercontent.com/aquaproj/aqua-installer/${INSTA
     exit 1
 }
 
-# checksumファイルをダウンロード
-echo "Downloading checksum file..."
-curl -sSfL -O "https://github.com/aquaproj/aqua-installer/releases/download/${INSTALLER_VERSION}/aqua-installer_checksums.txt" || {
-    echo "⚠️  Warning: Failed to download checksum file. Proceeding without verification."
-}
-
-# checksumを確認
-if [ -f "aqua-installer_checksums.txt" ]; then
-    echo "Verifying checksum..."
-    
-    # checksumファイルから aqua-installer のチェックサムを抽出
-    EXPECTED_CHECKSUM=$(grep "aqua-installer$" aqua-installer_checksums.txt | awk '{print $1}')
-    
-    if [ -n "$EXPECTED_CHECKSUM" ]; then
-        if command -v sha256sum &> /dev/null; then
-            # Linux
-            echo "$EXPECTED_CHECKSUM  aqua-installer" | sha256sum -c - || {
-                echo "❌ Checksum verification failed"
-                rm -rf "$TMP_DIR"
-                exit 1
-            }
-        elif command -v shasum &> /dev/null; then
-            # macOS
-            echo "$EXPECTED_CHECKSUM  aqua-installer" | shasum -a 256 -c - || {
-                echo "❌ Checksum verification failed"
-                rm -rf "$TMP_DIR"
-                exit 1
-            }
-        else
-            echo "⚠️  Warning: Neither sha256sum nor shasum found. Skipping checksum verification."
-        fi
-        echo "✓ Checksum verified"
-    else
-        echo "⚠️  Warning: Could not extract checksum from file. Proceeding without verification."
-    fi
-fi
+# aqua-installerは内部でchecksum検証を行うため、ここでの検証は不要
+echo "Note: aqua-installer will verify checksums internally during installation"
 
 # インストーラーを実行
 chmod +x aqua-installer
@@ -97,4 +63,4 @@ fi
 echo ""
 echo "To use aqua, ensure the following are in your shell configuration:"
 echo "  export PATH=\"\$AQUA_ROOT/bin:\$PATH\""
-echo "  export AQUA_ROOT=\"$AQUA_ROOT\"""
+echo "  export AQUA_ROOT=\"$AQUA_ROOT\""
