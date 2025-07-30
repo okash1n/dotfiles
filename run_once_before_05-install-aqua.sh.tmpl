@@ -1,0 +1,100 @@
+#!/usr/bin/env bash
+set -e
+
+# aquaを公式インストールスクリプトでインストール（checksum確認付き）
+
+echo "=== Installing aqua ==="
+
+# aquaがすでにインストールされているかチェック
+if command -v aqua &> /dev/null; then
+    echo "✓ aqua is already installed ($(aqua version))"
+    exit 0
+fi
+
+# インストール先ディレクトリを確認
+AQUA_ROOT="${AQUA_ROOT:-${XDG_DATA_HOME:-$HOME/.local/share}/aquaproj-aqua}"
+echo "AQUA_ROOT: $AQUA_ROOT"
+
+# 一時ディレクトリを作成
+TMP_DIR=$(mktemp -d)
+cd "$TMP_DIR"
+
+# aqua-installerの最新バージョンを取得
+echo "Fetching latest aqua-installer version..."
+INSTALLER_VERSION=$(curl -sSf https://api.github.com/repos/aquaproj/aqua-installer/releases/latest | grep '"tag_name"' | cut -d '"' -f 4)
+
+if [ -z "$INSTALLER_VERSION" ]; then
+    echo "⚠️  Failed to fetch latest version. Using fallback version."
+    INSTALLER_VERSION="v3.1.2"
+fi
+
+echo "Using aqua-installer $INSTALLER_VERSION"
+
+# aqua-installerをダウンロード
+echo "Downloading aqua-installer..."
+curl -sSfL -O "https://raw.githubusercontent.com/aquaproj/aqua-installer/${INSTALLER_VERSION}/aqua-installer" || {
+    echo "❌ Failed to download aqua-installer"
+    rm -rf "$TMP_DIR"
+    exit 1
+}
+
+# checksumファイルをダウンロード
+echo "Downloading checksum file..."
+curl -sSfL -O "https://github.com/aquaproj/aqua-installer/releases/download/${INSTALLER_VERSION}/aqua-installer_checksums.txt" || {
+    echo "⚠️  Warning: Failed to download checksum file. Proceeding without verification."
+}
+
+# checksumを確認
+if [ -f "aqua-installer_checksums.txt" ]; then
+    echo "Verifying checksum..."
+    
+    # checksumファイルから aqua-installer のチェックサムを抽出
+    EXPECTED_CHECKSUM=$(grep "aqua-installer$" aqua-installer_checksums.txt | awk '{print $1}')
+    
+    if [ -n "$EXPECTED_CHECKSUM" ]; then
+        if command -v sha256sum &> /dev/null; then
+            # Linux
+            echo "$EXPECTED_CHECKSUM  aqua-installer" | sha256sum -c - || {
+                echo "❌ Checksum verification failed"
+                rm -rf "$TMP_DIR"
+                exit 1
+            }
+        elif command -v shasum &> /dev/null; then
+            # macOS
+            echo "$EXPECTED_CHECKSUM  aqua-installer" | shasum -a 256 -c - || {
+                echo "❌ Checksum verification failed"
+                rm -rf "$TMP_DIR"
+                exit 1
+            }
+        else
+            echo "⚠️  Warning: Neither sha256sum nor shasum found. Skipping checksum verification."
+        fi
+        echo "✓ Checksum verified"
+    else
+        echo "⚠️  Warning: Could not extract checksum from file. Proceeding without verification."
+    fi
+fi
+
+# インストーラーを実行
+chmod +x aqua-installer
+./aqua-installer || {
+    echo "❌ Failed to install aqua"
+    rm -rf "$TMP_DIR"
+    exit 1
+}
+
+# クリーンアップ
+cd - > /dev/null
+rm -rf "$TMP_DIR"
+
+echo "✓ aqua installed successfully"
+
+# aquaのバージョンを確認
+if [ -f "$AQUA_ROOT/aqua" ]; then
+    "$AQUA_ROOT/aqua" version
+fi
+
+echo ""
+echo "To use aqua, ensure the following are in your shell configuration:"
+echo "  export PATH=\"\$AQUA_ROOT/bin:\$PATH\""
+echo "  export AQUA_ROOT=\"$AQUA_ROOT\"""
